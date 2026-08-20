@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>¿Cuánto vale tu embarcación? — Leandro Ramos Broker Náutico</title>
+  <link rel="icon" href="/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; color: #24303b; background: #f4f7fa; min-height: 100vh; }
+    .hero {
+      background: linear-gradient(160deg, #0d6dad 0%, #0a4f80 100%);
+      color: #fff; padding: 46px 20px 120px; text-align: center;
+    }
+    .hero img {
+      width: 84px; height: 89px; margin-bottom: 18px;
+      background: #fff; border-radius: 50%; padding: 14px;
+      box-shadow: 0 6px 24px rgba(0, 20, 40, 0.35);
+    }
+    .hero h1 { font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 600; line-height: 1.3; }
+    .hero p { opacity: 0.85; margin-top: 10px; font-size: 0.95rem; }
+    .ancla { font-size: 1.4rem; margin-bottom: 8px; display: block; }
+    .panel {
+      max-width: 640px; margin: -80px auto 60px; background: #fff; border-radius: 20px;
+      box-shadow: 0 14px 44px rgba(10, 60, 100, 0.16); padding: 34px 36px;
+    }
+    label { display: block; font-size: 0.7rem; font-weight: 600; color: #727272; text-transform: uppercase; letter-spacing: 0.07em; margin: 14px 0 5px; }
+    input, select { width: 100%; padding: 11px 15px; border: 1px solid #e2eaf1; border-radius: 10px; font-family: inherit; font-size: 0.92rem; }
+    input:focus, select:focus { outline: none; border-color: #0d6dad; }
+    .fila { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+    .fila.tres { grid-template-columns: 1fr 1fr 1fr; }
+    @media (max-width: 560px) { .fila, .fila.tres { grid-template-columns: 1fr; } }
+    .btn {
+      width: 100%; margin-top: 24px; background: #0d6dad; color: #fff; border: none; cursor: pointer;
+      padding: 15px; border-radius: 99px; font-family: inherit; font-size: 0.85rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase; transition: background 0.15s;
+    }
+    .btn:hover { background: #0a5a90; }
+    .btn:disabled { opacity: 0.6; }
+    .resultado { text-align: center; padding: 12px 0 4px; }
+    .resultado .banda { font-size: clamp(1.6rem, 5vw, 2.3rem); font-weight: 700; color: #0d6dad; margin: 12px 0 4px; }
+    .resultado .fundamento { font-size: 0.83rem; color: #727272; margin: 14px 0 20px; line-height: 1.6; }
+    .resultado .cta { background: #e8f2f9; border-radius: 14px; padding: 18px; font-size: 0.9rem; }
+    .nota { text-align: center; color: #9aa7b1; font-size: 0.75rem; margin-top: 18px; }
+    .interno {
+      max-width: 640px; margin: -30px auto 60px; border: 2px dashed #0d6dad55;
+      border-radius: 20px; padding: 26px 30px; background: #f8fbfd;
+    }
+    .interno .etiqueta-interno {
+      display: inline-block; background: #0d6dad; color: #fff; font-size: 0.68rem;
+      font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 99px; margin-bottom: 14px;
+    }
+    .wsp {
+      background: #e7f8ee; border-radius: 14px; padding: 16px 18px;
+      font-size: 0.86rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+      border: 1px solid #bfe8cf;
+    }
+    .similares { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 16px 0; }
+    .sim-card { background: #fff; border: 1px solid #e2eaf1; border-radius: 14px; overflow: hidden; text-decoration: none; color: #24303b; display: block; }
+    .sim-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: #eef2f5; }
+    .sim-card .info { padding: 10px 12px; font-size: 0.78rem; font-weight: 600; }
+    .sim-card .precio { color: #0d6dad; font-weight: 700; }
+    .btn-copiar {
+      margin-top: 14px; background: #0d6dad; color: #fff; border: none; cursor: pointer;
+      padding: 11px 22px; border-radius: 99px; font-family: inherit; font-size: 0.78rem;
+      font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .contacto-titulo { border-top: 1px solid #e2eaf1; margin-top: 26px; padding-top: 20px; font-size: 0.9rem; font-weight: 600; color: #0d6dad; }
+    .contacto-sub { font-size: 0.8rem; color: #727272; margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <img src="/img/logo.png" alt="Leandro Ramos Broker Náutico">
+    <span class="ancla">⚓</span>
+    <h1>¿Cuánto vale tu embarcación hoy?</h1>
+    <p>Valuación al instante, basada en operaciones reales del Delta — Leandro Ramos Broker Náutico</p>
+  </div>
+
+  <div class="panel">
+    <form id="form">
+      <div class="fila tres">
+        <div><label>Tipo</label><select name="tipo">
+          <option value="lancha open">Lancha open</option>
+          <option value="lancha cuddy">Lancha cuddy</option>
+          <option value="crucero">Crucero</option>
+          <option value="semirrigido/tracker">Semirrígido / tracker</option>
+          <option value="moto de agua">Moto de agua</option>
+          <option value="de coleccion">De colección</option>
+        </select></div>
+        <div><label>Marca</label><input name="marca" required placeholder="Quicksilver"></div>
+        <div><label>Modelo</label><input name="modelo" required placeholder="1700"></div>
+      </div>
+      <div class="fila tres">
+        <div><label>Año</label><input name="anio" type="number" required placeholder="2016"></div>
+        <div><label>Eslora (m)</label><input name="eslora" type="number" step="0.1" placeholder="5.2"></div>
+        <div><label>Horas de motor</label><input name="motor_horas" type="number" placeholder="500"></div>
+      </div>
+      <div class="fila tres">
+        <div><label>Marca de motor</label><input name="motor_marca" placeholder="Mercury"></div>
+        <div><label>HP (por motor)</label><input name="motor_hp" type="number" placeholder="90"></div>
+        <div><label>Cantidad de motores</label><select name="cantidad_motores">
+          <option value="1" selected>1</option><option value="2">2</option><option value="3">3</option>
+        </select></div>
+      </div>
+      <div class="fila">
+        <div><label>Estado general</label><select name="estado_general">
+          <option>excelente</option><option selected>muy bueno</option><option>bueno</option><option>a reacondicionar</option>
+        </select></div>
+        <div></div>
+      </div>
+
+      <div class="contacto-titulo">¿A dónde te mandamos la valuación completa?</div>
+      <div class="contacto-sub">Incluye comparables reales y qué conviene hacer antes de publicarla.</div>
+      <div class="fila">
+        <div><label>Tu nombre</label><input name="nombre" required></div>
+        <div><label>WhatsApp</label><input name="telefono" required placeholder="11 5555 5555"></div>
+      </div>
+      <button class="btn" type="submit">Ver cuánto vale</button>
+    </form>
+    <div id="resultado"></div>
+    <div class="nota">Sin compromiso. Tus datos no se comparten con nadie.</div>
+  </div>
+
+  <script>
+    const usd = n => 'USD ' + Number(n).toLocaleString('es-AR');
+    document.getElementById('form').onsubmit = async (ev) => {
+      ev.preventDefault();
+      const f = ev.target;
+      const btn = f.querySelector('.btn');
+      btn.disabled = true; btn.textContent = 'Calculando…';
+      const body = {
+        tipo: f.tipo.value, marca: f.marca.value, modelo: f.modelo.value,
+        anio: +f.anio.value, eslora: f.eslora.value ? +f.eslora.value : null,
+        motor_marca: f.motor_marca.value || null,
+        motor_hp: f.motor_hp.value ? +f.motor_hp.value : null,
+        cantidad_motores: +f.cantidad_motores.value,
+        motor_horas: f.motor_horas.value ? +f.motor_horas.value : null,
+        estado_general: f.estado_general.value,
+        nombre: f.nombre.value, telefono: f.telefono.value,
+      };
+      const r = await (await fetch('/api/tasar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json();
+      f.style.display = 'none';
+      document.getElementById('resultado').innerHTML = `
+        <div class="resultado">
+          <div style="font-size:0.85rem;color:#727272">Tu ${body.marca} ${body.modelo} ${body.anio} hoy se ubica entre</div>
+          <div class="banda">${usd(r.valor_estimado_min)} – ${usd(r.valor_estimado_max)}</div>
+          <div class="fundamento">${r.fundamento}</div>
+          <div class="cta"><strong>Leandro te escribe por WhatsApp</strong> con la valuación detallada y, si querés venderla, cómo conseguir el mejor precio en el Delta.</div>
+        </div>`;
+      renderInterno(r, false);
+    };
+
+    // Vista interna (para la demo): lo que el CRM le deja listo a Leandro
+    function renderInterno(r, esEjemplo) {
+      if (!r.mensaje_whatsapp) return;
+      const anterior = document.querySelector('.interno');
+      if (anterior) anterior.remove();
+      const sims = (r.similares || []).map(s => `
+        <a class="sim-card" href="${s.url || '#'}" target="_blank">
+          ${s.foto ? `<img src="${s.foto}" alt="${s.etiqueta}">` : ''}
+          <div class="info">${s.etiqueta}<br><span class="precio">${usd(s.precio)}</span></div>
+        </a>`).join('');
+      const interno = document.createElement('div');
+      interno.className = 'interno';
+      interno.innerHTML = `
+        <span class="etiqueta-interno">${esEjemplo ? 'Ejemplo — lo que ve Leandro en el CRM' : 'Lo que ve Leandro en el CRM'}</span>
+        <div style="font-size:0.85rem;color:#727272;margin-bottom:12px">${esEjemplo
+          ? 'Así queda el WhatsApp listo para enviar cuando alguien completa el tasador (ejemplo con una Quicksilver 1700 2016): la valuación + las publicaciones reales del stock que le pueden interesar.'
+          : 'El sistema ya captó el lead, registró la señal y dejó este WhatsApp listo para enviar — con las publicaciones reales del stock que le pueden interesar:'}</div>
+        ${sims ? `<div class="similares">${sims}</div>` : ''}
+        <div class="wsp"></div>
+        <button class="btn-copiar">Copiar mensaje</button>`;
+      document.querySelector('.panel').after(interno);
+      interno.querySelector('.wsp').textContent = r.mensaje_whatsapp;
+      interno.querySelector('.btn-copiar').onclick = async (e2) => {
+        await navigator.clipboard.writeText(r.mensaje_whatsapp);
+        e2.target.textContent = '¡Copiado!';
+        setTimeout(() => e2.target.textContent = 'Copiar mensaje', 2000);
+      };
+      if (!esEjemplo) interno.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Al cargar la página, mostrar el ejemplo (no persiste nada en el CRM)
+    (async () => {
+      try {
+        const r = await (await fetch('/api/tasar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+          _ejemplo: true, tipo: 'lancha open', marca: 'Quicksilver', modelo: '1700', anio: 2016,
+          eslora: 5.2, motor_marca: 'Mercury', motor_hp: 90, cantidad_motores: 1, motor_horas: 500,
+          estado_general: 'muy bueno', nombre: 'Raúl',
+        }) })).json();
+        renderInterno(r, true);
+      } catch {}
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: crm-nautico
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      # Pegar la API key en el panel de Render (Environment → Add Secret File / Variable).
+      # Sin key el CRM funciona igual: la extracción cae al modo sin conexión.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: NODE_VERSION
+        value: "22"

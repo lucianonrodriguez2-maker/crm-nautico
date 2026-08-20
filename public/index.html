@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CRM — Leandro Ramos Broker Náutico</title>
+  <link rel="icon" href="/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="marca">
+        <img src="/img/logo.png" alt="Leandro Ramos Broker Náutico">
+        <div class="nombre">Leandro Ramos<span>Broker Náutico · CRM</span></div>
+      </div>
+      <div class="nav-item" data-ruta="busquedas">Búsquedas <span class="badge" id="badge-busq" hidden></span></div>
+      <div class="nav-item" data-ruta="inventario">Inventario</div>
+      <div class="nav-item" data-ruta="hoy">⚓ Hoy · Agenda <span class="badge" id="badge-hoy" hidden></span></div>
+      <div class="nav-item" data-ruta="personas">Personas</div>
+      <div class="nav-item" data-ruta="radar">Radar ML/FB <span class="badge" id="badge-radar" hidden></span></div>
+      <div class="nav-item" data-ruta="operaciones">Operaciones</div>
+      <div class="nav-sep"></div>
+      <div class="nav-item" data-ruta="alta-busqueda">+ Búsqueda rápida</div>
+      <div class="nav-item" data-ruta="alta-embarcacion">+ Embarcación</div>
+      <div class="nav-item" onclick="window.open('/tasador','_blank')">Tasador ↗</div>
+      <div class="acciones">
+        <button class="btn sec mini" id="btn-simular">Simular mensaje entrante</button>
+      </div>
+    </aside>
+    <main class="main" id="vista"></main>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
