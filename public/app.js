@@ -505,13 +505,25 @@ rutas.inventario = async () => {
     ${sinPublicar.length ? `<div class="alerta-card" style="border-left:4px solid var(--rojo)">
       <div style="font-size:1.3rem">📣</div>
       <div class="cuerpo">
-        <div class="titulo">${sinPublicar.length} embarcación${sinPublicar.length > 1 ? 'es' : ''} en venta sin publicar en ningún lado</div>
+        <div class="titulo">${sinPublicar.length === 1 ? '1 embarcación' : sinPublicar.length + ' embarcaciones'} en venta sin publicar en ningún lado</div>
         <div class="detalle">${sinPublicar.map(e => esc(e.marca + ' ' + e.modelo + ' ' + (e.anio || ''))).join(' · ')} — no están ni en la web ni en Instagram: nadie las está viendo.</div>
       </div>
     </div>` : ''}
     <div class="barcos-grid">${enVenta.map(tarjetaBarco).join('')}</div>
-    <h2>Vendidas y barcos de ex-clientes</h2>
-    <div class="barcos-grid">${resto.map(tarjetaBarco).join('')}</div>`;
+
+    <h2 style="margin-top:34px;padding-top:22px;border-top:1px solid var(--borde)">
+      Fuera de inventario <span style="color:var(--gris-claro);font-weight:400;font-size:0.8rem">— ${resto.length} barcos que no están a la venta</span>
+    </h2>
+    <p class="sub">No son stock: son los que ya vendiste y los que hoy tienen tus ex-clientes. El CRM los recuerda porque son la materia prima de la escalera náutica — cuando uno de esos dueños esté para cambiar, ya sabés qué tiene, qué pagó y qué ofrecerle. Además, sus precios de venta reales son los que alimentan el tasador.</p>
+    <button class="btn sec mini" id="ver-fuera" style="margin-bottom:14px">Ver los ${resto.length} barcos</button>
+    <div class="barcos-grid" id="grid-fuera" hidden>${resto.map(tarjetaBarco).join('')}</div>`;
+
+  const btnFuera = document.getElementById('ver-fuera');
+  btnFuera.onclick = () => {
+    const g = document.getElementById('grid-fuera');
+    g.hidden = !g.hidden;
+    btnFuera.textContent = g.hidden ? `Ver los ${resto.length} barcos` : 'Ocultar';
+  };
 };
 
 rutas.embarcacion = async (id) => {
@@ -534,10 +546,11 @@ rutas.embarcacion = async (id) => {
         <div style="font-size:0.85rem;margin-top:8px">Publicada ${haceCuanto(e.publicado_en)}</div>
         <div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap">
           ${e.url_publicacion ? `<a class="btn sec mini" href="${esc(e.url_publicacion)}" target="_blank">🌐 Ver ficha en la web ↗</a>` : ''}
-          ${e.url_instagram ? `<a class="btn sec mini" href="${esc(e.url_instagram)}" target="_blank">📷 Ver posteo en Instagram ↗</a>` : ''}
+          ${e.url_instagram ? `<a class="btn sec mini" href="${esc(e.url_instagram)}" target="_blank">📷 ${/\/(reel|p)\//.test(e.url_instagram) ? 'Ver posteo en Instagram' : 'Ver perfil de Instagram'} ↗</a>` : ''}
           ${e.url_portal ? `<a class="btn sec mini" href="${esc(e.url_portal)}" target="_blank">Ver aviso en el portal ↗</a>` : ''}
         </div>
-        ${!e.url_instagram && e.situacion === 'en venta' ? '<div style="font-size:0.8rem;color:var(--gris);margin-top:8px">No está en Instagram — es el canal por el que llegan más consultas.</div>' : ''}`
+        ${!e.url_instagram && e.situacion === 'en venta' ? '<div style="font-size:0.8rem;color:var(--gris);margin-top:8px">No está en Instagram — es el canal por el que llegan más consultas.</div>' : ''}
+        ${e.url_instagram && !/\/(reel|p)\//.test(e.url_instagram) ? '<div style="font-size:0.78rem;color:var(--gris-claro);margin-top:8px">Del posteo solo quedó el perfil: cuando se publica desde el CRM, el link del posteo se guarda solo.</div>' : ''}`
       : `<div style="margin-top:8px"><span class="chip rojo">sin publicar</span>
          <span style="font-size:0.85rem;color:var(--gris)">No está ni en la web ni en Instagram: hoy no la está viendo nadie.</span></div>`}
     </div>

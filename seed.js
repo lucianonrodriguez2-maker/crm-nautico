@@ -346,7 +346,7 @@ insO.run(uid(), qs1700b.id, sergio.id, rodolfo.id, 17800, 'cerrada', dias(475), 
 const publicar = db.prepare(`UPDATE embarcacion SET publicado_en = ?, url_instagram = ?, url_portal = ? WHERE id = ?`);
 const IG = 'https://www.instagram.com/leandroramosbrokernautico/';
 publicar.run(dias(44), IG, null, qs2000.id);
-publicar.run(dias(19), IG, null, klaseA.id);
+publicar.run(dias(19), 'https://www.instagram.com/leandroramosbrokernautico/reel/DbRgeGhz04C/', null, klaseA.id);
 publicar.run(dias(7), IG, null, eclipse19.id);
 publicar.run(dias(128), null, 'https://listado.mercadolibre.com.ar/canestrari-245', canestrari245.id);
 publicar.run(dias(74), IG, null, quest210.id);
