@@ -202,6 +202,12 @@ try { db.exec('ALTER TABLE aviso_externo ADD COLUMN contacto TEXT'); } catch { /
 try { db.exec('ALTER TABLE embarcacion ADD COLUMN url_instagram TEXT'); } catch { /* ya existe */ }
 try { db.exec('ALTER TABLE embarcacion ADD COLUMN publicado_en TEXT'); } catch { /* ya existe */ }
 try { db.exec('ALTER TABLE embarcacion ADD COLUMN url_portal TEXT'); } catch { /* ya existe */ }
+// Seguro de cada embarcación: renovaciones y bajas son señales de venta (§4.2)
+try { db.exec('ALTER TABLE embarcacion ADD COLUMN aseguradora TEXT'); } catch { /* ya existe */ }
+try { db.exec('ALTER TABLE embarcacion ADD COLUMN poliza_numero TEXT'); } catch { /* ya existe */ }
+try { db.exec('ALTER TABLE embarcacion ADD COLUMN poliza_vence TEXT'); } catch { /* ya existe */ }
+try { db.exec('ALTER TABLE embarcacion ADD COLUMN poliza_prima_anual INTEGER'); } catch { /* ya existe */ }
+try { db.exec('ALTER TABLE embarcacion ADD COLUMN poliza_estado TEXT'); } catch { /* ya existe */ }
 
 const uid = () => crypto.randomUUID();
 const now = () => new Date().toISOString();

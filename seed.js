@@ -340,6 +340,31 @@ insO.run(uid(), qs1700b.id, gustavo.id, rodolfo.id, null, 'caída', dias(480), d
 // La 1700 de Rodolfo finalmente se la llevó Sergio (por eso Carla llegó tarde — Caso 1)
 insO.run(uid(), qs1700b.id, sergio.id, rodolfo.id, 17800, 'cerrada', dias(475), dias(455), null);
 
+// ——— Seguros de las embarcaciones ———
+// Renovaciones próximas = oportunidad de servicio; una baja = señal de que vendió (§4.2).
+const asegurar = db.prepare(`UPDATE embarcacion SET aseguradora=?, poliza_numero=?, poliza_vence=?, poliza_prima_anual=?, poliza_estado=? WHERE id=?`);
+asegurar.run('Allianz',   'ALZ-4471902', enDias(21, 12),  980, 'vigente', klaseA.id);
+asegurar.run('Sancor',    'SNC-118443',  enDias(9, 12),   540, 'vigente', eclipse19.id);
+asegurar.run('La Caja',   'LCJ-772310',  enDias(64, 12),  760, 'vigente', canestrari245.id);
+asegurar.run('Allianz',   'ALZ-4409155', enDias(-12, 12), 610, 'vencida', quest210.id);
+asegurar.run('Federación Patronal', 'FDP-205518', enDias(133, 12), 430, 'vigente', bayliner185.id);
+asegurar.run('Sancor',    'SNC-120877',  enDias(48, 12),  520, 'vigente', bermuda180.id);
+asegurar.run('La Caja',   'LCJ-780044',  enDias(88, 12),  890, 'vigente', geunaF44.id);
+asegurar.run('Allianz',   'ALZ-4502330', enDias(150, 12), 470, 'vigente', kiel190.id);
+asegurar.run('Sancor',    'SNC-119006',  enDias(-40, 12), 850, 'vencida', regnicoli.id);
+asegurar.run('La Caja',   'LCJ-771988',  enDias(27, 12),  690, 'vigente', eclipse21.id);
+asegurar.run('Federación Patronal', 'FDP-210043', enDias(96, 12), 390, 'vigente', qs1800w.id);
+asegurar.run('Allianz',   'ALZ-4488210', enDias(5, 12),   410, 'vigente', motoYam.id);
+asegurar.run('La Caja',   'LCJ-769901',  enDias(72, 12),  560, 'vigente', canes195.id);
+asegurar.run('Sancor',    'SNC-121455',  enDias(119, 12), 600, 'vigente', virgin20.id);
+asegurar.run('Allianz',   'ALZ-4390077', enDias(35, 12),  520, 'vigente', qs2000.id);
+// Barcos de ex-clientes: acá el seguro es la señal más valiosa de la escalera
+asegurar.run('Allianz',   'ALZ-4102338', enDias(16, 12),  380, 'vigente', qs1700martin.id);
+asegurar.run('Sancor',    'SNC-098771',  enDias(58, 12),  620, 'vigente', quest210hernan.id);
+asegurar.run('La Caja',   'LCJ-733015',  dias(24),        340, 'dada de baja', eclipse16seba.id);
+asegurar.run('Federación Patronal', 'FDP-188220', enDias(102, 12), 300, 'vigente', bayJorge.id);
+// Sin seguro registrado (alerta): piccini, colec, tracker16, bermuda de Silvia ya cubierta arriba
+
 // ——— Dónde está publicada cada embarcación ———
 // Las que tienen ficha en el sitio se publicaron ahí (y varias también en Instagram).
 // Las que NO figuran acá quedan "sin publicar": el CRM las marca como alerta.
@@ -476,6 +501,7 @@ insS.run(uid(), martin.id, 'menciono_limitacion', 7, '"Con los chicos ya no nos 
 insS.run(uid(), martin.id, 'aniversario_compra', 3, 'Se cumplen 5 años de la compra de la Quicksilver 1700', null, dias(35));
 // Sebastián — señales más débiles, segundo en el ranking
 insS.run(uid(), seba.id, 'interactuo_en_redes', 2, 'Le dio like a las últimas 4 publicaciones de cuddys en Instagram', null, dias(20));
+insS.run(uid(), seba.id, 'dio_de_baja_seguro', 8, 'Dio de baja el seguro de la Eclipse 16 en La Caja — el barco ya no está asegurado', eclipse16seba.id, dias(24));
 insS.run(uid(), seba.id, 'menciono_limitacion', 7, '"Somos 5, vamos apretados" (última conversación)', null, dias(80));
 insS.run(uid(), seba.id, 'aniversario_compra', 3, '6 años de la compra de la Eclipse 16', null, dias(60));
 // Hernán — todavía tranquilo

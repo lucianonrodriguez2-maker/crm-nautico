@@ -225,7 +225,7 @@ textarea { resize: vertical; min-height: 90px; }
 /* ===== Trayectoria náutica ===== */
 .trayectoria { margin: 12px 0; border-left: 2px solid var(--borde); padding-left: 14px; }
 .hito { display: flex; align-items: baseline; gap: 10px; font-size: 0.88rem; margin: 8px 0; }
-.hito-anio { font-weight: 700; color: var(--azul); min-width: 42px; }
+.hito-anio { font-weight: 700; color: var(--azul); min-width: 96px; font-size: 0.82rem; }
 .proximo-contacto {
   background: var(--azul-suave); border-radius: 10px; padding: 10px 14px;
   font-size: 0.86rem; margin-top: 8px;

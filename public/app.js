@@ -275,6 +275,102 @@ rutas.agenda = async () => {
   if (ancla) ancla.scrollIntoView({ behavior: 'smooth' });
 };
 
+/* ==================== SEGUROS ==================== */
+rutas.seguros = async () => {
+  vista.innerHTML = '<div class="cargando">Cargando…</div>';
+  const polizas = await api('/api/seguros');
+  const conSeguro = polizas.filter(p => !p.sin_seguro);
+  const bajas = conSeguro.filter(p => p.poliza_estado === 'dada de baja');
+  const vencidas = conSeguro.filter(p => p.poliza_estado === 'vencida');
+  const porVencer = conSeguro.filter(p => p.poliza_estado === 'vigente' && p.dias_para_vencer !== null && p.dias_para_vencer <= 30);
+  const sinSeguro = polizas.filter(p => p.sin_seguro && p.situacion === 'en venta');
+  const badge = document.getElementById('badge-seguros');
+  const urgentes = bajas.length + vencidas.length + porVencer.length;
+  badge.hidden = !urgentes; badge.textContent = urgentes;
+
+  const porCia = {};
+  for (const p of conSeguro) {
+    const c = porCia[p.aseguradora] = porCia[p.aseguradora] || { n: 0, prima: 0 };
+    c.n++; c.prima += p.poliza_prima_anual || 0;
+  }
+
+  const estadoChip = (p) => {
+    if (p.poliza_estado === 'dada de baja') return '<span class="chip rojo">dada de baja</span>';
+    if (p.poliza_estado === 'vencida') return '<span class="chip rojo">vencida</span>';
+    if (p.dias_para_vencer !== null && p.dias_para_vencer <= 30) return `<span class="chip amarillo">vence en ${p.dias_para_vencer} días</span>`;
+    return '<span class="chip verde">vigente</span>';
+  };
+
+  const filaPoliza = (p) => `
+    <tr class="click" onclick="location.hash='#/embarcacion/${p.id}'">
+      <td style="font-weight:600">${esc(p.marca)} ${esc(p.modelo)} <span style="color:var(--gris);font-weight:400">${p.anio || ''}</span>
+        <div style="font-size:0.76rem;color:var(--gris-claro);font-weight:400">${esc(p.situacion)}</div></td>
+      <td>${p.aseguradora ? `<strong>${esc(p.aseguradora)}</strong><div style="font-size:0.76rem;color:var(--gris-claro)">${esc(p.poliza_numero || '')}</div>` : '<span class="chip rojo">sin seguro</span>'}</td>
+      <td>${p.poliza_vence ? fecha(p.poliza_vence) : '—'}</td>
+      <td>${p.poliza_prima_anual ? usd(p.poliza_prima_anual) + '<div style="font-size:0.72rem;color:var(--gris-claro)">al año</div>' : '—'}</td>
+      <td>${p.aseguradora ? estadoChip(p) : ''}</td>
+      <td>${p.propietario ? `<a href="#/persona/${p.propietario_id}" onclick="event.stopPropagation()">${esc(p.propietario)}</a>` : '<span style="color:var(--gris-claro)">—</span>'}</td>
+    </tr>`;
+
+  vista.innerHTML = `
+    <h1>Seguros <span style="color:var(--gris-claro);font-weight:400;font-size:1rem">— ${conSeguro.length} pólizas registradas</span></h1>
+    <p class="sub">Qué compañía asegura cada embarcación, cuándo vence y cuánto se paga. Sirve para tres cosas: que ningún barco quede sin cobertura, tener una excusa legítima de contacto en cada renovación, y detectar bajas de póliza — que casi siempre significan que el dueño vendió.</p>
+
+    <div class="kpis">
+      ${Object.entries(porCia).sort((a, b) => b[1].n - a[1].n).map(([cia, d]) => `
+        <div class="kpi"><div class="valor">${d.n}</div><div class="etiqueta">${esc(cia)}</div>
+        <div style="font-size:0.74rem;color:var(--gris-claro);margin-top:4px">${usd(d.prima)} en primas</div></div>`).join('')}
+    </div>
+
+    ${bajas.length ? `<h2>Dieron de baja el seguro — casi seguro vendieron</h2>
+      ${bajas.map(p => `
+        <div class="alerta-card" style="border-left:4px solid var(--rojo)">
+          <div style="font-size:1.3rem">🚨</div>
+          <div class="cuerpo">
+            <div class="titulo">${esc(p.marca)} ${esc(p.modelo)} ${p.anio || ''} — ${p.propietario ? `<a href="#/persona/${p.propietario_id}">${esc(p.propietario)}</a>` : 'sin dueño registrado'}</div>
+            <div class="detalle">Póliza de ${esc(p.aseguradora)} dada de baja. Si vendió el barco por su cuenta, hoy es un comprador sin embarcación: llamalo.</div>
+          </div>
+          ${p.propietario_id ? `<button class="btn mini" onclick="location.hash='#/persona/${p.propietario_id}'">Ver ficha</button>` : ''}
+        </div>`).join('')}` : ''}
+
+    ${vencidas.length ? `<h2>Pólizas vencidas</h2>
+      ${vencidas.map(p => `
+        <div class="alerta-card">
+          <span class="semaforo rojo" style="margin-top:6px"></span>
+          <div class="cuerpo">
+            <div class="titulo">${esc(p.marca)} ${esc(p.modelo)} ${p.anio || ''} <span class="chip gris">${esc(p.situacion)}</span></div>
+            <div class="detalle">${esc(p.aseguradora)} · venció ${haceCuanto(p.poliza_vence)}${p.propietario ? ' · ' + esc(p.propietario) : ''} — sin cobertura no conviene ni sacarla a probar.</div>
+          </div>
+        </div>`).join('')}` : ''}
+
+    ${porVencer.length ? `<h2>Vencen en los próximos 30 días</h2>
+      ${porVencer.map(p => `
+        <div class="alerta-card">
+          <span class="semaforo amarillo" style="margin-top:6px"></span>
+          <div class="cuerpo">
+            <div class="titulo">${esc(p.marca)} ${esc(p.modelo)} ${p.anio || ''}</div>
+            <div class="detalle">${esc(p.aseguradora)} vence el ${fecha(p.poliza_vence)} (en ${p.dias_para_vencer} días) · ${usd(p.poliza_prima_anual)} al año${p.propietario ? ' · ' + esc(p.propietario) : ''}</div>
+          </div>
+        </div>`).join('')}` : ''}
+
+    ${sinSeguro.length ? `<h2>En venta y sin seguro registrado</h2>
+      <div class="alerta-card">
+        <div style="font-size:1.3rem">📋</div>
+        <div class="cuerpo">
+          <div class="titulo">${sinSeguro.length === 1 ? '1 embarcación' : sinSeguro.length + ' embarcaciones'} del stock sin póliza cargada</div>
+          <div class="detalle">${sinSeguro.map(p => esc(p.marca + ' ' + p.modelo + ' ' + (p.anio || ''))).join(' · ')} — conviene confirmarlo antes de una prueba de navegación.</div>
+        </div>
+      </div>` : ''}
+
+    <h2>Todas las pólizas</h2>
+    <div class="card">
+      <table>
+        <tr><th>Embarcación</th><th>Compañía</th><th>Vence</th><th>Prima</th><th>Estado</th><th>Dueño</th></tr>
+        ${polizas.map(filaPoliza).join('')}
+      </table>
+    </div>`;
+};
+
 /* ==================== RADAR DE MERCADO (ML / Marketplace) ==================== */
 rutas.radar = async () => {
   vista.innerHTML = '<div class="cargando">Cargando…</div>';
@@ -382,7 +478,7 @@ rutas.persona = async (id) => {
       <div class="trayectoria">
         ${p.trayectoria.hitos.map(h => `
           <div class="hito ${h.tipo === 'compró' ? 'compra' : 'venta'}">
-            <span class="hito-anio">${new Date(h.fecha).getFullYear()}</span>
+            <span class="hito-anio">${fecha(h.fecha)}</span>
             <span class="hito-icono">${h.tipo === 'compró' ? '🛥' : '💰'}</span>
             <span><strong>${h.tipo === 'compró' ? 'Compró' : 'Vendió'}</strong> ${esc(h.embarcacion)}${h.precio ? ' por <strong>' + usd(h.precio) + '</strong>' : ''}${h.vinculada ? ' <span class="chip">upgrade</span>' : ''}</span>
           </div>`).join('')}
@@ -419,7 +515,7 @@ rutas.persona = async (id) => {
             ${b.motivo_cierre ? `<div style="font-size:0.8rem;color:var(--gris-claro);margin-top:6px">Cierre: ${esc(b.motivo_cierre)}</div>` : ''}
           </div>`).join('') : '<div class="vacio">Sin búsquedas registradas.</div>'}
 
-        ${p.embarcaciones.length ? `<h2>Sus embarcaciones</h2>${p.embarcaciones.map(e => `
+        ${p.embarcaciones.length ? `<h2>${p.embarcaciones.length === 1 ? 'Embarcación actual' : 'Sus embarcaciones'}</h2>${p.embarcaciones.map(e => `
           <div class="card" style="margin-bottom:10px">
             <a href="#/embarcacion/${e.id}" style="font-weight:600">${esc(e.marca)} ${esc(e.modelo)} ${e.anio || ''}</a>
             <span class="chip gris">${esc(e.situacion)}</span>
@@ -568,6 +664,9 @@ rutas.embarcacion = async (id) => {
           <tr><td style="color:var(--gris)">Papeles</td><td>${esc(e.papeles_estado || '—')}${e.papeles_notas ? ' · ' + esc(e.papeles_notas) : ''}</td></tr>
           ${e.propietario ? `<tr><td style="color:var(--gris)">Propietario</td><td><a href="#/persona/${e.propietario.id}">${esc(e.propietario.nombre)}</a></td></tr>` : ''}
           ${e.combustible_litros ? `<tr><td style="color:var(--gris)">Combustible</td><td>${e.combustible_litros} L</td></tr>` : ''}
+          <tr><td style="color:var(--gris)">Seguro</td><td>${e.aseguradora
+            ? esc(e.aseguradora) + (e.poliza_estado && e.poliza_estado !== 'vigente' ? ' <span class="chip rojo">' + esc(e.poliza_estado) + '</span>' : '') + (e.poliza_vence ? '<div style="font-size:0.76rem;color:var(--gris-claro)">vence ' + fecha(e.poliza_vence) + (e.poliza_prima_anual ? ' · ' + usd(e.poliza_prima_anual) + '/año' : '') + '</div>' : '')
+            : '<span class="chip rojo">sin seguro registrado</span>'}</td></tr>
         </table>
         ${(e.equipamiento || []).length ? `<div style="margin-top:10px">${chips(e.equipamiento, 'gris')}</div>` : ''}
       </div>

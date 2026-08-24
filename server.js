@@ -479,6 +479,24 @@ app.get('/api/operaciones', (req, res) => {
 
 app.get('/api/escalera', (req, res) => res.json(scoreUpgrade()));
 
+/* ============================== SEGUROS ============================== */
+// Pólizas por embarcación: renovaciones próximas (servicio y excusa de contacto)
+// y bajas de póliza (señal fuerte de que el dueño vendió, §4.2).
+app.get('/api/seguros', (req, res) => {
+  const rows = db.prepare(`
+    SELECT e.id, e.marca, e.modelo, e.anio, e.tipo, e.eslora, e.situacion, e.precio_pedido,
+           e.fotos, e.aseguradora, e.poliza_numero, e.poliza_vence, e.poliza_prima_anual, e.poliza_estado,
+           p.id AS propietario_id, p.nombre AS propietario, p.telefono
+    FROM embarcacion e LEFT JOIN persona p ON p.id = e.propietario_id
+    ORDER BY (e.poliza_vence IS NULL), e.poliza_vence ASC`).all();
+  const dias = (iso) => iso ? Math.round((new Date(iso).getTime() - Date.now()) / 864e5) : null;
+  res.json(rows.map(e => ({
+    ...e, fotos: j(e.fotos),
+    dias_para_vencer: dias(e.poliza_vence),
+    sin_seguro: !e.aseguradora,
+  })));
+});
+
 /* ============================== RADAR DE MERCADO ============================== */
 // En producción: job periódico contra la API de MercadoLibre (categoría náutica, zona norte)
 // + revisión asistida de Marketplace. Acá los avisos ya están relevados (mock).
