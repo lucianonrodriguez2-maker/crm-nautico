@@ -449,7 +449,7 @@ rutas.personas = async () => {
         </tr>`).join('')}
     </table>`;
   vista.innerHTML = `
-    <h1>Personas</h1>
+    <h1>Clientes</h1>
     <p class="sub">Una sola entidad para todos los roles: la misma persona compra, vende y vuelve a comprar.</p>
     <input type="text" id="buscar" placeholder="Buscar por nombre, teléfono o Instagram…" style="margin-bottom:16px">
     <div class="card" id="tabla-personas">${render(personas)}</div>`;
@@ -464,7 +464,7 @@ rutas.persona = async (id) => {
   vista.innerHTML = '<div class="cargando">Cargando…</div>';
   const p = await api('/api/personas/' + id);
   vista.innerHTML = `
-    <a class="volver" href="#/personas">← Personas</a>
+    <a class="volver" href="#/personas">← Clientes</a>
     <h1>${esc(p.nombre)} ${chips(p.roles)}${p.no_contactar ? '<span class="chip rojo">NO CONTACTAR</span>' : ''}</h1>
     <p class="sub">
       ${esc(p.telefono || '')} ${p.instagram_handle ? ' · ' + esc(p.instagram_handle) : ''}${p.email ? ' · ' + esc(p.email) : ''}

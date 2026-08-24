@@ -418,10 +418,10 @@ function mensajeWhatsAppTasacion(b, resultado, similares) {
   const lineas = [
     `${nombre ? 'Hola ' + nombre + '!' : '¡Hola!'} Soy Leandro Ramos, broker náutico de San Fernando. Acá va la valuación de tu ${[b.marca, b.modelo, b.anio].filter(Boolean).join(' ')}:`,
     `📊 Hoy el mercado la ubica entre USD ${resultado.valor_estimado_min.toLocaleString('es-AR')} y USD ${resultado.valor_estimado_max.toLocaleString('es-AR')}. Si querés te paso el detalle de los comparables.`,
-    `Si estás pensando en venderla, la trabajo yo y te consigo el mejor precio del Delta.`,
+    `Si decidís venderla, la trabajo yo y te consigo el mejor precio del Delta.`,
   ];
   if (similares.length) {
-    lineas.push(`Y si la idea es cambiarla por algo más, mirá lo que tengo en stock ahora:`);
+    lineas.push(`Si estás evaluando un cambio, estas son las embarcaciones disponibles hoy en un rango similar:`);
     for (const s of similares) {
       lineas.push(`⚓ ${s.etiqueta} — USD ${s.precio.toLocaleString('es-AR')}${s.url ? '\n' + s.url : ''}`);
     }
