@@ -198,6 +198,10 @@ CREATE TABLE IF NOT EXISTS auditoria (
 try { db.exec('ALTER TABLE cita ADD COLUMN gcal_event_id TEXT'); } catch { /* ya existe */ }
 try { db.exec('ALTER TABLE aviso_externo ADD COLUMN foto TEXT'); } catch { /* ya existe */ }
 try { db.exec('ALTER TABLE aviso_externo ADD COLUMN contacto TEXT'); } catch { /* ya existe */ }
+// Dónde está publicada cada embarcación (web propia, Instagram, portales)
+try { db.exec('ALTER TABLE embarcacion ADD COLUMN url_instagram TEXT'); } catch { /* ya existe */ }
+try { db.exec('ALTER TABLE embarcacion ADD COLUMN publicado_en TEXT'); } catch { /* ya existe */ }
+try { db.exec('ALTER TABLE embarcacion ADD COLUMN url_portal TEXT'); } catch { /* ya existe */ }
 
 const uid = () => crypto.randomUUID();
 const now = () => new Date().toISOString();

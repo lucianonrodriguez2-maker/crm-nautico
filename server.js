@@ -306,7 +306,7 @@ app.get('/api/embarcaciones', (req, res) => {
       CAST(julianday('now') - julianday(e.ingresada_en) AS INTEGER) AS dias_en_stock
     FROM embarcacion e LEFT JOIN persona p ON p.id = e.propietario_id
     ORDER BY CASE e.situacion WHEN 'en venta' THEN 0 ELSE 1 END, e.ingresada_en DESC`).all();
-  res.json(rows.map(e => ({ ...e, equipamiento: j(e.equipamiento) })));
+  res.json(rows.map(e => ({ ...e, equipamiento: j(e.equipamiento), fotos: j(e.fotos) })));
 });
 
 app.get('/api/embarcaciones/:id', (req, res) => {
@@ -318,7 +318,7 @@ app.get('/api/embarcaciones/:id', (req, res) => {
     FROM conversacion c JOIN persona p ON p.id = c.persona_id
     WHERE c.embarcacion_referida_id = ? ORDER BY c.ultima_actividad DESC`).all(e.id);
   const candidatos = e.situacion === 'en venta' ? candidatosParaEmbarcacion(e.id) : [];
-  res.json({ ...e, equipamiento: j(e.equipamiento), propietario, consultas, candidatos });
+  res.json({ ...e, equipamiento: j(e.equipamiento), fotos: j(e.fotos), propietario, consultas, candidatos });
 });
 
 // Alta de embarcación → matching inmediato → propuestas pendientes de aprobación (Caso 1)

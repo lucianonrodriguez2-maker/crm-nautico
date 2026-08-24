@@ -469,31 +469,49 @@ rutas.inventario = async () => {
   const emb = await api('/api/embarcaciones');
   const enVenta = emb.filter(e => e.situacion === 'en venta');
   const resto = emb.filter(e => e.situacion !== 'en venta');
-  const fila = (e) => `
-    <tr class="click" onclick="location.hash='#/embarcacion/${e.id}'">
-      <td style="font-weight:600">${esc(e.marca)} ${esc(e.modelo)} <span style="color:var(--gris);font-weight:400">${e.anio || ''}</span></td>
-      <td><span class="chip gris">${esc(e.tipo)}</span></td>
-      <td>${e.eslora || '—'} m</td>
-      <td>${usd(e.precio_pedido)}</td>
-      <td>${e.situacion === 'en venta' ? (e.dias_en_stock > 120 ? `<span class="chip rojo">${e.dias_en_stock} días</span>` : e.dias_en_stock + ' días') : '<span class="chip gris">' + esc(e.situacion) + '</span>'}</td>
-      <td>${e.consultas || '—'}</td>
-    </tr>`;
-  vista.innerHTML = `
-    <h1>Inventario</h1>
-    <p class="sub">${enVenta.length} en venta · los barcos estancados (+120 días) se marcan en rojo.</p>
-    <div class="card">
-      <table>
-        <tr><th>Embarcación</th><th>Tipo</th><th>Eslora</th><th>Precio pedido</th><th>En stock</th><th>Consultas</th></tr>
-        ${enVenta.map(fila).join('')}
-      </table>
-    </div>
-    <h2>Vendidas y barcos de ex-clientes</h2>
-    <div class="card">
-      <table>
-        <tr><th>Embarcación</th><th>Tipo</th><th>Eslora</th><th>Precio</th><th>Situación</th><th>Consultas</th></tr>
-        ${resto.map(fila).join('')}
-      </table>
+  const sinPublicar = enVenta.filter(e => !e.publicado_en);
+
+  const publicacionChips = (e) => {
+    if (!e.publicado_en) return '<span class="chip rojo">sin publicar</span>';
+    const chips = [];
+    if (e.url_publicacion) chips.push('<span class="chip verde">🌐 web</span>');
+    if (e.url_instagram) chips.push('<span class="chip">📷 Instagram</span>');
+    if (e.url_portal) chips.push('<span class="chip amarillo">portal</span>');
+    if (!chips.length) chips.push('<span class="chip gris">publicada</span>');
+    return chips.join('');
+  };
+
+  const tarjetaBarco = (e) => `
+    <div class="barco-card" onclick="location.hash='#/embarcacion/${e.id}'">
+      <div class="barco-foto">
+        ${e.fotos && e.fotos.length ? `<img src="${esc(e.fotos[0])}" alt="${esc(e.marca + ' ' + e.modelo)}" loading="lazy">` : '<div class="barco-sinfoto">⚓<span>sin fotos cargadas</span></div>'}
+        ${e.situacion === 'en venta' && e.dias_en_stock > 120 ? `<span class="barco-alerta">${e.dias_en_stock} días en stock</span>` : ''}
+        ${e.situacion !== 'en venta' ? `<span class="barco-situacion">${esc(e.situacion)}</span>` : ''}
+      </div>
+      <div class="barco-cuerpo">
+        <div class="barco-nombre">${esc(e.marca)} ${esc(e.modelo)} <span style="color:var(--gris);font-weight:400">${e.anio || ''}</span></div>
+        <div class="barco-precio">${usd(e.precio_pedido)}</div>
+        <div class="barco-meta">${esc(e.tipo)} · ${e.eslora || '?'} m${e.motor_hp ? ' · ' + e.motor_hp + ' HP' : ''}${e.tiene_bano ? ' · con baño' : ''}</div>
+        <div style="margin-top:8px">${publicacionChips(e)}</div>
+        <div class="barco-meta" style="margin-top:6px">
+          ${e.situacion === 'en venta' ? `${e.dias_en_stock} días en stock · ` : ''}${e.consultas ? e.consultas + ' consulta' + (e.consultas > 1 ? 's' : '') : 'sin consultas'}
+        </div>
+      </div>
     </div>`;
+
+  vista.innerHTML = `
+    <h1>Inventario <span style="color:var(--gris-claro);font-weight:400;font-size:1rem">— ${enVenta.length} en venta</span></h1>
+    <p class="sub">Cada lancha muestra dónde está publicada. Las que llevan más de 120 días en stock salen marcadas.</p>
+    ${sinPublicar.length ? `<div class="alerta-card" style="border-left:4px solid var(--rojo)">
+      <div style="font-size:1.3rem">📣</div>
+      <div class="cuerpo">
+        <div class="titulo">${sinPublicar.length} embarcación${sinPublicar.length > 1 ? 'es' : ''} en venta sin publicar en ningún lado</div>
+        <div class="detalle">${sinPublicar.map(e => esc(e.marca + ' ' + e.modelo + ' ' + (e.anio || ''))).join(' · ')} — no están ni en la web ni en Instagram: nadie las está viendo.</div>
+      </div>
+    </div>` : ''}
+    <div class="barcos-grid">${enVenta.map(tarjetaBarco).join('')}</div>
+    <h2>Vendidas y barcos de ex-clientes</h2>
+    <div class="barcos-grid">${resto.map(tarjetaBarco).join('')}</div>`;
 };
 
 rutas.embarcacion = async (id) => {
@@ -505,6 +523,24 @@ rutas.embarcacion = async (id) => {
     <a class="volver" href="#/inventario">← Inventario</a>
     <h1>${esc(e.marca)} ${esc(e.modelo)} ${e.anio || ''} <span class="chip ${e.situacion === 'en venta' ? 'verde' : 'gris'}">${esc(e.situacion)}</span></h1>
     <p class="sub">${esc(e.tipo)} · ${e.eslora || '?'} m de eslora${e.manga ? ' × ' + e.manga + ' m' : ''} · ${esc(e.motor_marca || '')} ${e.motor_hp || '?'} HP ${esc(e.motor_tipo || '')} · ${e.motor_horas ?? '?'} horas</p>
+
+    ${(e.fotos && e.fotos.length) ? `<div class="ficha-fotos">
+      ${e.fotos.map(f => `<img src="${esc(f)}" alt="${esc(e.marca + ' ' + e.modelo)}">`).join('')}
+    </div>` : `<div class="ficha-sinfoto">⚓<div>Sin fotos cargadas${e.situacion === 'en venta' ? ' — hace falta una sesión de fotos antes de publicarla' : ''}</div></div>`}
+
+    <div class="card" style="margin-bottom:14px">
+      <strong style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--azul)">Dónde está publicada</strong>
+      ${e.publicado_en ? `
+        <div style="font-size:0.85rem;margin-top:8px">Publicada ${haceCuanto(e.publicado_en)}</div>
+        <div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap">
+          ${e.url_publicacion ? `<a class="btn sec mini" href="${esc(e.url_publicacion)}" target="_blank">🌐 Ver ficha en la web ↗</a>` : ''}
+          ${e.url_instagram ? `<a class="btn sec mini" href="${esc(e.url_instagram)}" target="_blank">📷 Ver posteo en Instagram ↗</a>` : ''}
+          ${e.url_portal ? `<a class="btn sec mini" href="${esc(e.url_portal)}" target="_blank">Ver aviso en el portal ↗</a>` : ''}
+        </div>
+        ${!e.url_instagram && e.situacion === 'en venta' ? '<div style="font-size:0.8rem;color:var(--gris);margin-top:8px">No está en Instagram — es el canal por el que llegan más consultas.</div>' : ''}`
+      : `<div style="margin-top:8px"><span class="chip rojo">sin publicar</span>
+         <span style="font-size:0.85rem;color:var(--gris)">No está ni en la web ni en Instagram: hoy no la está viendo nadie.</span></div>`}
+    </div>
 
     <div class="grid dos">
       <div class="card">

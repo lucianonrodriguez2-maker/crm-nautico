@@ -14,8 +14,8 @@ const insP = db.prepare(`INSERT INTO persona (id,nombre,telefono,email,instagram
 VALUES (@id,@nombre,@telefono,@email,@instagram_handle,@prometheo_id,@origen,@referido_por,@roles,@estado,@contexto_personal,@notas_libres,@no_contactar,@creado_en,@ultima_interaccion)`);
 const insB = db.prepare(`INSERT INTO busqueda (id,persona_id,tipo_embarcacion,eslora_min,eslora_max,presupuesto_min,presupuesto_max,motor_tipo,hp_min,uso_declarado,necesita_bano,necesita_trailer,urgencia,entrega_algo,limitacion_declarada,estado,motivo_cierre,texto_original,creada_en,actualizada_en)
 VALUES (@id,@persona_id,@tipo_embarcacion,@eslora_min,@eslora_max,@presupuesto_min,@presupuesto_max,@motor_tipo,@hp_min,@uso_declarado,@necesita_bano,@necesita_trailer,@urgencia,@entrega_algo,@limitacion_declarada,@estado,@motivo_cierre,@texto_original,@creada_en,@actualizada_en)`);
-const insE = db.prepare(`INSERT INTO embarcacion (id,tipo,marca,modelo,anio,eslora,manga,motor_marca,motor_hp,motor_tipo,motor_horas,combustible_litros,equipamiento,estado_general,tiene_bano,tiene_trailer,precio_pedido,precio_minimo_aceptado,precio_venta_real,propietario_id,situacion,exclusividad,papeles_estado,fotos,url_publicacion,ingresada_en)
-VALUES (@id,@tipo,@marca,@modelo,@anio,@eslora,@manga,@motor_marca,@motor_hp,@motor_tipo,@motor_horas,@combustible_litros,@equipamiento,@estado_general,@tiene_bano,@tiene_trailer,@precio_pedido,@precio_minimo_aceptado,@precio_venta_real,@propietario_id,@situacion,@exclusividad,@papeles_estado,@fotos,@url_publicacion,@ingresada_en)`);
+const insE = db.prepare(`INSERT INTO embarcacion (id,tipo,marca,modelo,anio,eslora,manga,motor_marca,motor_hp,motor_tipo,motor_horas,combustible_litros,equipamiento,estado_general,tiene_bano,tiene_trailer,precio_pedido,precio_minimo_aceptado,precio_venta_real,propietario_id,situacion,exclusividad,papeles_estado,fotos,url_publicacion,url_instagram,publicado_en,ingresada_en)
+VALUES (@id,@tipo,@marca,@modelo,@anio,@eslora,@manga,@motor_marca,@motor_hp,@motor_tipo,@motor_horas,@combustible_litros,@equipamiento,@estado_general,@tiene_bano,@tiene_trailer,@precio_pedido,@precio_minimo_aceptado,@precio_venta_real,@propietario_id,@situacion,@exclusividad,@papeles_estado,@fotos,@url_publicacion,@url_instagram,@publicado_en,@ingresada_en)`);
 const insO = db.prepare(`INSERT INTO operacion (id,embarcacion_id,comprador_id,vendedor_id,precio_cierre,etapa,fecha_primer_contacto,fecha_cierre,operacion_vinculada_id) VALUES (?,?,?,?,?,?,?,?,?)`);
 const insC = db.prepare(`INSERT INTO conversacion (id,persona_id,canal,estado,embarcacion_referida_id,ultima_actividad) VALUES (?,?,?,?,?,?)`);
 const insM = db.prepare(`INSERT INTO mensaje (id,conversacion_id,direccion,contenido,timestamp,autor,respondido_en) VALUES (?,?,?,?,?,?,?)`);
@@ -50,7 +50,7 @@ function barco(o) {
     combustible_litros: 100, equipamiento: '["ecosonda","estéreo","toldo"]', estado_general: 'muy bueno',
     tiene_bano: 0, tiene_trailer: 0, precio_pedido: 20000, precio_minimo_aceptado: null, precio_venta_real: null,
     propietario_id: null, situacion: 'en venta', exclusividad: 'exclusiva', papeles_estado: 'al día',
-    fotos: '[]', url_publicacion: null,
+    fotos: '[]', url_publicacion: null, url_instagram: null, publicado_en: null,
     ingresada_en: dias(90)
   }, o);
   if (!e.precio_minimo_aceptado && e.precio_pedido) e.precio_minimo_aceptado = Math.round(e.precio_pedido * 0.9);
@@ -142,7 +142,7 @@ const nico = persona({
 const cachi = persona({
   nombre: 'Osvaldo "Cachi" Medrano', telefono: '11 4901 3356', origen: 'guarderia/club',
   roles: '["vendedor"]',
-  contexto_personal: 'Guardería Náutica San Fernando. Vende la Piccini de su viejo, papeles a medio hacer.',
+  contexto_personal: 'Guardería Náutica San Fernando. Vende la Paglietini de su viejo, un clásico del 80. Papeles a medio hacer.',
   notas_libres: 'Papeles: falta sucesión. No publicar hasta resolver.',
   creado_en: dias(30), ultima_interaccion: dias(15)
 });
@@ -256,7 +256,7 @@ const rodolfo = persona({
 });
 const marta = persona({
   nombre: 'Marta Iglesias', telefono: '11 5093 6672', origen: 'referido', roles: '["vendedor","ex-cliente-vendedor"]',
-  contexto_personal: 'Vendió la Bermuda Cuddy en 2023 (la compró Silvia) y la Eclipse 16 en 2019.',
+  contexto_personal: 'Vendió la Canestrari 215 en 2023 (la compró Silvia) y la Eclipse 16 en 2019.',
   creado_en: dias(2600), ultima_interaccion: dias(900)
 });
 const claudio = persona({
@@ -279,19 +279,19 @@ const eclipse19 = barco({ tipo: 'lancha open', marca: 'Arco Iris', modelo: 'Ecli
 const canestrari245 = barco({ tipo: 'crucero', marca: 'Canestrari', modelo: '245', anio: 2015, url_publicacion: 'https://leandroramosbrokernautico.com/property/canestrari-245-2015-2-2/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2026/07/Canestrari245_2015_ML-340x340.png"]', eslora: 7.5, manga: 2.7, motor_marca: 'Volvo Penta', motor_hp: 270, motor_tipo: 'dentro-fuera', motor_horas: 610, combustible_litros: 280, precio_pedido: 52000, equipamiento: '["baño marino","camarote doble","cocina","heladera","VHF","GPS plotter"]', estado_general: 'muy bueno', tiene_bano: 1, ingresada_en: dias(130) });
 const quest210 = barco({ tipo: 'lancha cuddy', marca: 'Quest', modelo: '210', anio: 2016, propietario_id: nestor.id, url_publicacion: 'https://leandroramosbrokernautico.com/property/quest-210-2016/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2026/05/Quest210_2016_ML-340x340.png"]', eslora: 6.4, manga: 2.44, motor_marca: 'Mercruiser', motor_hp: 220, motor_tipo: 'dentro-fuera', motor_horas: 540, combustible_litros: 180, precio_pedido: 33000, equipamiento: '["baño químico","VHF","ecosonda","toldo"]', estado_general: 'bueno', tiene_bano: 1, ingresada_en: dias(75) });
 const bayliner185 = barco({ tipo: 'lancha open', marca: 'Bayliner', modelo: '185', anio: 2010, url_publicacion: 'https://leandroramosbrokernautico.com/property/bayliner-185-2010/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2026/02/Bayliner185_2010_ML-340x340.png"]', eslora: 5.6, manga: 2.2, motor_marca: 'Mercruiser', motor_hp: 135, motor_tipo: 'dentro-fuera', motor_horas: 700, combustible_litros: 110, precio_pedido: 19500, equipamiento: '["estéreo","toldo"]', estado_general: 'bueno', tiene_trailer: 1, ingresada_en: dias(160) });
-const piccini = barco({ tipo: 'lancha open', marca: 'Piccini', modelo: '505 Open', anio: 2010, eslora: 5.05, manga: 2.0, motor_marca: 'Evinrude', motor_hp: 75, motor_horas: 850, combustible_litros: 80, precio_pedido: 12500, equipamiento: '["toldo"]', estado_general: 'a reacondicionar', situacion: 'en venta', papeles_estado: 'falta bastante', propietario_id: cachi.id, ingresada_en: dias(28) });
-const bermuda180 = barco({ tipo: 'lancha cuddy', marca: 'Bermuda', modelo: 'Cuddy 180', anio: 2016, eslora: 5.5, manga: 2.25, motor_marca: 'Yamaha', motor_hp: 115, motor_horas: 460, combustible_litros: 100, precio_pedido: 24500, equipamiento: '["baño químico","ecosonda","toldo","estéreo"]', estado_general: 'muy bueno', tiene_bano: 1, propietario_id: silvia.id, ingresada_en: dias(18) });
-const geunaF44 = barco({ tipo: 'crucero', marca: 'Geuna', modelo: 'F44', anio: 2008, eslora: 8.2, manga: 2.9, motor_marca: 'Volvo Penta', motor_hp: 300, motor_tipo: 'intraborda', motor_horas: 1200, combustible_litros: 400, precio_pedido: 60000, equipamiento: '["dos camarotes","baño marino","cocina completa","heladera","VHF","radar"]', estado_general: 'muy bueno', tiene_bano: 1, propietario_id: ruben.id, ingresada_en: dias(120) });
+const piccini = barco({ tipo: 'lancha open', marca: 'Paglietini', modelo: '620', anio: 1980, eslora: 6.2, manga: 2.2, motor_marca: 'Evinrude', motor_hp: 75, motor_horas: 850, url_publicacion: 'https://leandroramosbrokernautico.com/property/paglietini-620-1980/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2025/04/Paglietini620_1980_ML-340x340.png"]', combustible_litros: 80, precio_pedido: 12500, equipamiento: '["toldo"]', estado_general: 'a reacondicionar', situacion: 'en venta', papeles_estado: 'falta bastante', propietario_id: cachi.id, ingresada_en: dias(28) });
+const bermuda180 = barco({ tipo: 'lancha cuddy', marca: 'Canestrari', modelo: '215', anio: 2013, eslora: 6.4, manga: 2.44, motor_marca: 'Mercruiser', motor_hp: 180, motor_tipo: 'dentro-fuera', motor_horas: 460, url_publicacion: 'https://leandroramosbrokernautico.com/property/canestrari-215-2013-2/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2026/05/Canestrari215_2013_ML-340x340.png"]', combustible_litros: 100, precio_pedido: 24500, equipamiento: '["baño químico","ecosonda","toldo","estéreo"]', estado_general: 'muy bueno', tiene_bano: 1, propietario_id: silvia.id, ingresada_en: dias(18) });
+const geunaF44 = barco({ tipo: 'crucero', marca: 'Segue', modelo: '32', anio: 2008, eslora: 9.75, manga: 3.2, motor_marca: 'Volvo Penta', motor_hp: 300, motor_tipo: 'intraborda', motor_horas: 1200, combustible_litros: 400, precio_pedido: 60000, url_publicacion: 'https://leandroramosbrokernautico.com/property/segue-32-2008/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2026/05/Segue32_2008_ML-340x340.png"]', equipamiento: '["dos camarotes","baño marino","cocina completa","heladera","VHF","radar"]', estado_general: 'muy bueno', tiene_bano: 1, propietario_id: ruben.id, ingresada_en: dias(120) });
 const kiel190 = barco({ tipo: 'semirrigido/tracker', marca: 'Prinz', modelo: '630', anio: 2012, propietario_id: walter.id, eslora: 6.3, url_publicacion: 'https://leandroramosbrokernautico.com/property/prinz-630-2012/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2023/11/Portada_Web_Prinz630_2012-340x340.png"]', manga: 2.3, motor_marca: 'Yamaha', motor_hp: 100, motor_horas: 350, combustible_litros: 90, precio_pedido: 21000, equipamiento: '["ecosonda","VHF"]', estado_general: 'muy bueno', tiene_trailer: 1, ingresada_en: dias(55) });
-const tracker16 = barco({ tipo: 'semirrigido/tracker', marca: 'Tracker Marine', modelo: 'Pro 16', anio: 2014, eslora: 4.9, manga: 1.95, motor_marca: 'Mercury', motor_hp: 60, motor_horas: 520, combustible_litros: 60, precio_pedido: 13500, equipamiento: '["ecosonda","porta cañas"]', estado_general: 'bueno', tiene_trailer: 1, ingresada_en: dias(200) });
+const tracker16 = barco({ tipo: 'semirrigido/tracker', marca: 'Benavidez', modelo: '720', anio: 2011, eslora: 7.2, manga: 2.5, motor_marca: 'Mercury', motor_hp: 150, motor_horas: 520, combustible_litros: 60, precio_pedido: 19500, equipamiento: '["ecosonda","porta cañas"]', estado_general: 'bueno', tiene_trailer: 1, ingresada_en: dias(200) });
 const regnicoli = barco({ tipo: 'crucero', marca: 'Trento', modelo: '285 Success', anio: 2010, eslora: 8.7, manga: 3.0, motor_marca: 'Volvo Penta', motor_hp: 260, motor_tipo: 'intraborda', motor_horas: 980, combustible_litros: 350, precio_pedido: 55000, url_publicacion: 'https://leandroramosbrokernautico.com/property/trento-285-success-2010/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2026/03/Trento285_2010_ML-340x340.png"]', equipamiento: '["dos camarotes","baño marino","cocina","generador"]', estado_general: 'bueno', tiene_bano: 1, ingresada_en: dias(240) });
 const eclipse21 = barco({ tipo: 'lancha open', marca: 'MasterCraft', modelo: 'X214', anio: 2010, propietario_id: fabian.id, eslora: 6.55, manga: 2.49, motor_marca: 'Ilmor', motor_hp: 350, motor_tipo: 'intraborda', motor_horas: 480, combustible_litros: 160, precio_pedido: 36500, url_publicacion: 'https://leandroramosbrokernautico.com/property/mastercraft-x214-2010/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2026/04/MastercraftX214_2010_ML-340x340.png"]', equipamiento: '["torre de wakeboard","ecosonda","estéreo","toldo"]', estado_general: 'excelente', ingresada_en: dias(10) });
 const qs1800w = barco({ tipo: 'lancha open', marca: 'Quicksilver', modelo: '1800', anio: 2007, eslora: 5.5, manga: 2.24, motor_marca: 'Mercury', motor_hp: 115, motor_horas: 620, combustible_litros: 100, precio_pedido: 16500, url_publicacion: 'https://leandroramosbrokernautico.com/property/quicksilver-1800-2007/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2026/02/Quicksilver1800_2007_ML-340x340.png"]', equipamiento: '["estéreo","toldo"]', estado_general: 'muy bueno', tiene_trailer: 1, ingresada_en: dias(65) });
-const virgin20 = barco({ tipo: 'lancha open', marca: 'Virgin Marine', modelo: 'Custom 20', anio: 2015, eslora: 6.0, manga: 2.35, motor_marca: 'Yamaha', motor_hp: 130, motor_horas: 550, combustible_litros: 130, precio_pedido: 25500, equipamiento: '["ecosonda","toldo","estéreo"]', estado_general: 'muy bueno', ingresada_en: dias(95) });
+const virgin20 = barco({ tipo: 'lancha open', marca: 'Piccini', modelo: '229 S', anio: 2021, eslora: 6.9, manga: 2.45, motor_marca: 'Yamaha', motor_hp: 200, motor_horas: 260, combustible_litros: 130, precio_pedido: 32000, url_publicacion: 'https://leandroramosbrokernautico.com/property/piccini-229-s-2021/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2026/02/Piccini229S_2021_ML-340x340.png"]', equipamiento: '["ecosonda","toldo","estéreo"]', estado_general: 'muy bueno', ingresada_en: dias(95) });
 const baader = barco({ tipo: 'lancha open', marca: 'Baader', modelo: 'Malibú', anio: 2009, eslora: 5.3, manga: 2.1, motor_marca: 'Johnson', motor_hp: 90, motor_horas: 900, combustible_litros: 90, precio_pedido: 14000, equipamiento: '["toldo"]', estado_general: 'bueno', tiene_trailer: 1, ingresada_en: dias(310) });
 const motoYam = barco({ tipo: 'moto de agua', marca: 'Yamaha', modelo: 'FX Cruiser', anio: 2021, eslora: 3.58, manga: 1.27, motor_marca: 'Yamaha', motor_hp: 180, motor_horas: 90, combustible_litros: 70, precio_pedido: 17500, url_publicacion: 'https://leandroramosbrokernautico.com/property/yamaha-fx-cruiser-2021/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2025/03/YamahaFXCruiser_2021_ML-340x340.png"]', equipamiento: '["cover","trailer"]', estado_general: 'excelente', tiene_trailer: 1, ingresada_en: dias(40) });
 const colec = barco({ tipo: 'de coleccion', marca: 'Astillero San Isidro', modelo: '70', anio: 1984, eslora: 7.0, manga: 2.6, motor_marca: 'Perkins', motor_hp: 90, motor_tipo: 'intraborda', motor_horas: 1500, combustible_litros: 200, precio_pedido: 45000, url_publicacion: 'https://leandroramosbrokernautico.com/property/san-isidro-70-1984/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2026/02/SanIsidro70_1984_ML-340x340.png"]', equipamiento: '["clásico de madera","restaurado"]', estado_general: 'excelente', ingresada_en: dias(400) });
-const canes195 = barco({ tipo: 'lancha open', marca: 'Canestrari', modelo: '185 Open', anio: 2017, eslora: 5.6, manga: 2.25, motor_marca: 'Mercury', motor_hp: 115, motor_horas: 390, combustible_litros: 110, precio_pedido: 24000, equipamiento: '["ecosonda","toldo","estéreo","escalera inox"]', estado_general: 'muy bueno', tiene_trailer: 1, ingresada_en: dias(33) });
+const canes195 = barco({ tipo: 'lancha open', marca: 'Klase A', modelo: '210', anio: 2022, eslora: 6.4, manga: 2.44, motor_marca: 'Mercury', motor_hp: 150, motor_horas: 220, combustible_litros: 110, precio_pedido: 28500, url_publicacion: 'https://leandroramosbrokernautico.com/property/klase-a-210-2022-2/', fotos: '["https://leandroramosbrokernautico.com/wp-content/uploads/2026/04/KlaseA210_2022_ML-340x340.png"]', equipamiento: '["ecosonda","toldo","estéreo","escalera inox"]', estado_general: 'muy bueno', tiene_trailer: 1, ingresada_en: dias(33) });
 const qs1700b = barco({ tipo: 'lancha open', marca: 'Quicksilver', modelo: '1700', anio: 2014, eslora: 5.2, manga: 2.13, motor_marca: 'Mercury', motor_hp: 90, motor_horas: 620, combustible_litros: 90, precio_pedido: 18500, equipamiento: '["toldo","estéreo"]', estado_general: 'bueno', tiene_trailer: 1, situacion: 'vendida', precio_venta_real: 17800, ingresada_en: dias(500) });
 inv.push(qs2000, klaseA, eclipse19, canestrari245, quest210, bayliner185, piccini, bermuda180, geunaF44, kiel190, tracker16, regnicoli, eclipse21, qs1800w, virgin20, baader, motoYam, colec, canes195);
 
@@ -340,6 +340,30 @@ insO.run(uid(), qs1700b.id, gustavo.id, rodolfo.id, null, 'caída', dias(480), d
 // La 1700 de Rodolfo finalmente se la llevó Sergio (por eso Carla llegó tarde — Caso 1)
 insO.run(uid(), qs1700b.id, sergio.id, rodolfo.id, 17800, 'cerrada', dias(475), dias(455), null);
 
+// ——— Dónde está publicada cada embarcación ———
+// Las que tienen ficha en el sitio se publicaron ahí (y varias también en Instagram).
+// Las que NO figuran acá quedan "sin publicar": el CRM las marca como alerta.
+const publicar = db.prepare(`UPDATE embarcacion SET publicado_en = ?, url_instagram = ?, url_portal = ? WHERE id = ?`);
+const IG = 'https://www.instagram.com/leandroramosbrokernautico/';
+publicar.run(dias(44), IG, null, qs2000.id);
+publicar.run(dias(19), IG, null, klaseA.id);
+publicar.run(dias(7), IG, null, eclipse19.id);
+publicar.run(dias(128), null, 'https://listado.mercadolibre.com.ar/canestrari-245', canestrari245.id);
+publicar.run(dias(74), IG, null, quest210.id);
+publicar.run(dias(158), null, null, bayliner185.id);
+publicar.run(dias(17), IG, null, bermuda180.id);
+publicar.run(dias(118), null, 'https://listado.mercadolibre.com.ar/segue-32', geunaF44.id);
+publicar.run(dias(54), null, null, kiel190.id);
+publicar.run(dias(238), null, null, regnicoli.id);
+publicar.run(dias(9), IG, null, eclipse21.id);
+publicar.run(dias(64), null, null, qs1800w.id);
+publicar.run(dias(39), IG, null, motoYam.id);
+publicar.run(dias(398), null, null, colec.id);
+publicar.run(dias(32), IG, null, canes195.id);
+publicar.run(dias(94), null, null, virgin20.id);
+publicar.run(dias(27), null, null, piccini.id);
+// Sin publicar en ningún lado (alerta del CRM): tracker16 (Benavidez recién ingresado)
+
 // Al cerrarse una venta el barco pasa al comprador (así el ex-cliente tiene barco propio → Caso 3)
 const traspaso = db.prepare(`UPDATE embarcacion SET propietario_id = ?, situacion = 'no está a la venta' WHERE id = ?`);
 traspaso.run(mati.id, trackerMartin.id);       // el tracker de Martín lo compró Matías
@@ -370,7 +394,7 @@ busqueda({ persona_id: martin.id, tipo_embarcacion: '["lancha open"]', eslora_mi
 // CASO 3 — la búsqueda NUEVA de Martín, deducida de señales: quiere cuddy/crucero con baño
 busqueda({ persona_id: martin.id, tipo_embarcacion: '["lancha cuddy","crucero"]', eslora_min: 6.0, eslora_max: 7.8, presupuesto_min: 30000, presupuesto_max: 60000, necesita_bano: 1, uso_declarado: '["paseo familiar","dormir a bordo"]', urgencia: 'en los próximos meses', entrega_algo: 1, embarcacion_entrega_id: qs1700martin.id, limitacion_declarada: 'Con dos chicos ya no les alcanza la open: quieren baño y hacer noche', creada_en: dias(2), texto_original: '(deducida por el sistema a partir de señales — pendiente de confirmar con Martín)' });
 busqueda({ persona_id: hernan.id, tipo_embarcacion: '["lancha cuddy"]', eslora_min: 6.0, eslora_max: 6.8, presupuesto_min: 22000, presupuesto_max: 30000, necesita_bano: 1, uso_declarado: '["pesca"]', urgencia: 'ya', estado: 'satisfecha', motivo_cierre: 'Compró la Quest 210 (2020)', creada_en: dias(2110), actualizada_en: dias(2040) });
-busqueda({ persona_id: silvia.id, tipo_embarcacion: '["lancha cuddy"]', eslora_min: 5.2, eslora_max: 6.0, presupuesto_min: 18000, presupuesto_max: 24000, necesita_bano: 1, uso_declarado: '["paseo familiar"]', urgencia: 'ya', estado: 'satisfecha', motivo_cierre: 'Compró la Bermuda Cuddy 180 (2023)', creada_en: dias(1130), actualizada_en: dias(1080) });
+busqueda({ persona_id: silvia.id, tipo_embarcacion: '["lancha cuddy"]', eslora_min: 5.2, eslora_max: 6.0, presupuesto_min: 18000, presupuesto_max: 24000, necesita_bano: 1, uso_declarado: '["paseo familiar"]', urgencia: 'ya', estado: 'satisfecha', motivo_cierre: 'Compró la Canestrari 215 (2023)', creada_en: dias(1130), actualizada_en: dias(1080) });
 busqueda({ persona_id: seba.id, tipo_embarcacion: '["lancha open"]', presupuesto_min: 10000, presupuesto_max: 14000, uso_declarado: '["paseo familiar"]', urgencia: 'ya', estado: 'satisfecha', motivo_cierre: 'Compró la Eclipse 16 (2019)', creada_en: dias(2530), actualizada_en: dias(2440) });
 busqueda({ persona_id: federico.id, tipo_embarcacion: '["lancha open"]', eslora_min: 5.5, eslora_max: 6.5, presupuesto_min: 22000, presupuesto_max: 32000, uso_declarado: '["paseo familiar"]', urgencia: 'mirando sin apuro', estado: 'perdida', motivo_cierre: 'Dejó de responder — probablemente compró por MercadoLibre', creada_en: dias(215), actualizada_en: dias(100) });
 busqueda({ persona_id: graciela.id, tipo_embarcacion: '["lancha open"]', presupuesto_min: 15000, presupuesto_max: 20000, uso_declarado: '["paseo familiar"]', urgencia: 'mirando sin apuro', estado: 'pausada', motivo_cierre: 'Retoma en primavera (dijo en marzo)', creada_en: dias(235), actualizada_en: dias(190) });
@@ -527,8 +551,8 @@ insA.run(uid(), 'mercadolibre', 'Crucero Regnicoli Marfil 26 2009 — motor Cumm
   'Coincide con la tasación web que hizo Óscar hace 12 días', null, '11 4302 5561');
 insA.run(uid(), 'marketplace', 'Tracker de pesca 2016 con trailer y ecosonda',
   'https://www.facebook.com/marketplace/search?query=tracker%20pesca', 15800, 17500, 17500, 1, dias(60), dias(55), dias(7), null, 0, null, null, 'vía Marketplace (Messenger)');
-insA.run(uid(), 'marketplace', 'Sea-Doo GTI 130 2018, service hecho',
-  'https://www.facebook.com/marketplace/search?query=seadoo%20gti', 11500, null, 11500, 0, dias(5), dias(4), null, null, 0, null, 'https://leandroramosbrokernautico.com/wp-content/uploads/2023/09/RSV_SeadooGTi130_2011_ML-340x340.png', 'vía Marketplace (Messenger)');
+insA.run(uid(), 'marketplace', 'Yamaha GP1800 2018 — service hecho, poco uso',
+  'https://www.facebook.com/marketplace/search?query=yamaha%20gp1800', 11500, null, 11500, 0, dias(5), dias(4), null, null, 0, null, 'https://leandroramosbrokernautico.com/wp-content/uploads/2024/08/YamahaGP1800_2018_ML-340x340.png', 'vía Marketplace (Messenger)');
 
 console.log('Seed OK:',
   db.prepare('SELECT COUNT(*) n FROM persona').get().n, 'personas ·',
