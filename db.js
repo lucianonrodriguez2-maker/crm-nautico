@@ -209,6 +209,99 @@ try { db.exec('ALTER TABLE embarcacion ADD COLUMN poliza_vence TEXT'); } catch {
 try { db.exec('ALTER TABLE embarcacion ADD COLUMN poliza_prima_anual INTEGER'); } catch { /* ya existe */ }
 try { db.exec('ALTER TABLE embarcacion ADD COLUMN poliza_estado TEXT'); } catch { /* ya existe */ }
 
+// ———————————————————————————————————————————————————————————————————————————
+// Estructura de automatización: eventos, matching y carga de unidades por WhatsApp
+// ———————————————————————————————————————————————————————————————————————————
+db.exec(`
+-- Eventos del dominio (outbox). Cada hecho relevante queda registrado y los handlers
+-- (matching, avisos) lo procesan una sola vez, sin importar desde dónde se originó.
+CREATE TABLE IF NOT EXISTS evento (
+  id TEXT PRIMARY KEY,
+  tipo TEXT NOT NULL,           -- embarcacion.publicada · embarcacion.precio_bajado · busqueda.creada · busqueda.reabierta
+  entidad_id TEXT NOT NULL,
+  datos TEXT,                   -- JSON
+  creado_en TEXT NOT NULL,
+  procesado_en TEXT,
+  resultado TEXT,               -- JSON con lo que hizo cada handler
+  error TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_evento_pendiente ON evento(procesado_en) WHERE procesado_en IS NULL;
+
+-- Quiénes pueden cargar unidades por WhatsApp (Leandro y su equipo). Cualquier otro número se ignora.
+CREATE TABLE IF NOT EXISTS operador (
+  telefono TEXT PRIMARY KEY,    -- E.164
+  nombre TEXT NOT NULL,
+  activo INTEGER NOT NULL DEFAULT 1,
+  creado_en TEXT NOT NULL
+);
+
+-- La unidad se arma conversando y recién pasa al inventario cuando el operador confirma.
+CREATE TABLE IF NOT EXISTS borrador_embarcacion (
+  id TEXT PRIMARY KEY,
+  operador_tel TEXT NOT NULL,
+  canal TEXT NOT NULL,          -- whatsapp · simulador · web
+  estado TEXT NOT NULL DEFAULT 'abierto', -- abierto · publicado · cancelado
+  datos TEXT NOT NULL DEFAULT '{}',
+  fotos TEXT NOT NULL DEFAULT '[]',
+  embarcacion_id TEXT REFERENCES embarcacion(id),
+  creado_en TEXT NOT NULL,
+  actualizado_en TEXT NOT NULL
+);
+
+-- Todo lo que pasó por el canal de carga, en los dos sentidos.
+CREATE TABLE IF NOT EXISTS intake_mensaje (
+  id TEXT PRIMARY KEY,
+  operador_tel TEXT NOT NULL,
+  canal TEXT NOT NULL,
+  direccion TEXT NOT NULL,      -- entrante · saliente
+  texto TEXT,
+  medios TEXT DEFAULT '[]',
+  borrador_id TEXT,
+  timestamp TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_intake_operador ON intake_mensaje(operador_tel, timestamp);
+
+-- Última lista que se le mandó al operador, para que "1 3" o "todos" sepa a qué se refiere.
+CREATE TABLE IF NOT EXISTS operador_contexto (
+  operador_tel TEXT PRIMARY KEY,
+  tipo TEXT NOT NULL,           -- lista_propuestas
+  datos TEXT NOT NULL,          -- JSON
+  actualizado_en TEXT NOT NULL
+);
+
+-- Parámetros del negocio que Leandro puede ajustar sin tocar código.
+CREATE TABLE IF NOT EXISTS config (
+  clave TEXT PRIMARY KEY,
+  valor TEXT NOT NULL,
+  descripcion TEXT
+);
+`);
+try { db.exec('ALTER TABLE propuesta ADD COLUMN origen TEXT'); } catch { /* ya existe */ }      // alta · precio_bajado · busqueda_nueva · manual
+try { db.exec('ALTER TABLE propuesta ADD COLUMN factores TEXT'); } catch { /* ya existe */ }    // JSON: desglose del puntaje
+try { db.exec('ALTER TABLE busqueda ADD COLUMN modelo_referencia TEXT'); } catch { /* ya existe */ } // "Quicksilver 1700"
+try { db.exec('ALTER TABLE busqueda ADD COLUMN marcas_preferidas TEXT'); } catch { /* ya existe */ } // JSON
+try { db.exec('ALTER TABLE embarcacion ADD COLUMN cantidad_motores INTEGER'); } catch { /* ya existe */ }
+try { db.exec('ALTER TABLE embarcacion ADD COLUMN notas TEXT'); } catch { /* ya existe */ }
+try { db.exec('ALTER TABLE embarcacion ADD COLUMN cargada_por TEXT'); } catch { /* ya existe */ } // operador y canal: "Leandro · whatsapp"
+try { db.exec('ALTER TABLE intake_mensaje ADD COLUMN externo_id TEXT'); } catch { /* ya existe */ } // id del proveedor (wamid): Meta reintenta webhooks
+db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_intake_externo ON intake_mensaje(externo_id) WHERE externo_id IS NOT NULL");
+// El simulador del CRM siempre tiene un operador. Los números reales se habilitan por OPERADORES_WHATSAPP o desde el CRM.
+db.prepare("INSERT OR IGNORE INTO operador (telefono, nombre, activo, creado_en) VALUES ('sim:leandro', 'Leandro', 1, ?)").run(new Date().toISOString());
+
+const CONFIG_DEFAULT = {
+  'matching.tolerancia_precio': ['0.15', 'Cuánto por encima del presupuesto máximo se acepta un barco (0.15 = 15%). La gente estira por el barco correcto.'],
+  'matching.tolerancia_casi': ['0.30', 'Hasta cuánto por encima se considera "casi entra": si el dueño baja, se suma.'],
+  'matching.piso_presupuesto': ['0.60', 'Por debajo de este % del presupuesto mínimo, el barco se considera fuera de su categoría.'],
+  'matching.puntaje_minimo': ['25', 'Puntaje mínimo para proponer un barco desde la búsqueda (las propuestas desde el alta no tienen piso).'],
+};
+const insConfig = db.prepare('INSERT OR IGNORE INTO config (clave, valor, descripcion) VALUES (?,?,?)');
+for (const [k, [v, d]] of Object.entries(CONFIG_DEFAULT)) insConfig.run(k, v, d);
+
+function config(clave, porDefecto = null) {
+  const r = db.prepare('SELECT valor FROM config WHERE clave = ?').get(clave);
+  return r ? r.valor : porDefecto;
+}
+
 const uid = () => crypto.randomUUID();
 const now = () => new Date().toISOString();
 
@@ -229,4 +322,4 @@ function auditar(personaId, accion, detalle, autor = 'sistema') {
     .run(uid(), personaId, accion, detalle || null, autor, now());
 }
 
-module.exports = { db, uid, now, normalizarTelefono, auditar };
+module.exports = { db, uid, now, normalizarTelefono, auditar, config };

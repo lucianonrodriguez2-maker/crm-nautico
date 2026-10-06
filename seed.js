@@ -6,14 +6,14 @@ const hoy = new Date();
 const dias = (n) => new Date(hoy.getTime() - n * 864e5).toISOString();
 const enDias = (n, hora = 10) => { const d = new Date(hoy.getTime() + n * 864e5); d.setHours(hora, 0, 0, 0); return d.toISOString(); };
 
-db.exec(`DELETE FROM auditoria; DELETE FROM aviso_externo; DELETE FROM propuesta; DELETE FROM cita; DELETE FROM senal;
+db.exec(`DELETE FROM evento; DELETE FROM intake_mensaje; DELETE FROM borrador_embarcacion; DELETE FROM operador_contexto; DELETE FROM auditoria; DELETE FROM aviso_externo; DELETE FROM propuesta; DELETE FROM cita; DELETE FROM senal;
 DELETE FROM tasacion; DELETE FROM mensaje; DELETE FROM conversacion; DELETE FROM operacion;
 DELETE FROM busqueda; UPDATE embarcacion SET propietario_id=NULL; DELETE FROM embarcacion; DELETE FROM persona;`);
 
 const insP = db.prepare(`INSERT INTO persona (id,nombre,telefono,email,instagram_handle,prometheo_id,origen,referido_por,roles,estado,contexto_personal,notas_libres,no_contactar,creado_en,ultima_interaccion)
 VALUES (@id,@nombre,@telefono,@email,@instagram_handle,@prometheo_id,@origen,@referido_por,@roles,@estado,@contexto_personal,@notas_libres,@no_contactar,@creado_en,@ultima_interaccion)`);
-const insB = db.prepare(`INSERT INTO busqueda (id,persona_id,tipo_embarcacion,eslora_min,eslora_max,presupuesto_min,presupuesto_max,motor_tipo,hp_min,uso_declarado,necesita_bano,necesita_trailer,urgencia,entrega_algo,limitacion_declarada,estado,motivo_cierre,texto_original,creada_en,actualizada_en)
-VALUES (@id,@persona_id,@tipo_embarcacion,@eslora_min,@eslora_max,@presupuesto_min,@presupuesto_max,@motor_tipo,@hp_min,@uso_declarado,@necesita_bano,@necesita_trailer,@urgencia,@entrega_algo,@limitacion_declarada,@estado,@motivo_cierre,@texto_original,@creada_en,@actualizada_en)`);
+const insB = db.prepare(`INSERT INTO busqueda (id,persona_id,tipo_embarcacion,eslora_min,eslora_max,presupuesto_min,presupuesto_max,motor_tipo,hp_min,uso_declarado,necesita_bano,necesita_trailer,urgencia,entrega_algo,limitacion_declarada,estado,motivo_cierre,texto_original,creada_en,actualizada_en,modelo_referencia,marcas_preferidas)
+VALUES (@id,@persona_id,@tipo_embarcacion,@eslora_min,@eslora_max,@presupuesto_min,@presupuesto_max,@motor_tipo,@hp_min,@uso_declarado,@necesita_bano,@necesita_trailer,@urgencia,@entrega_algo,@limitacion_declarada,@estado,@motivo_cierre,@texto_original,@creada_en,@actualizada_en,@modelo_referencia,@marcas_preferidas)`);
 const insE = db.prepare(`INSERT INTO embarcacion (id,tipo,marca,modelo,anio,eslora,manga,motor_marca,motor_hp,motor_tipo,motor_horas,combustible_litros,equipamiento,estado_general,tiene_bano,tiene_trailer,precio_pedido,precio_minimo_aceptado,precio_venta_real,propietario_id,situacion,exclusividad,papeles_estado,fotos,url_publicacion,url_instagram,publicado_en,ingresada_en)
 VALUES (@id,@tipo,@marca,@modelo,@anio,@eslora,@manga,@motor_marca,@motor_hp,@motor_tipo,@motor_horas,@combustible_litros,@equipamiento,@estado_general,@tiene_bano,@tiene_trailer,@precio_pedido,@precio_minimo_aceptado,@precio_venta_real,@propietario_id,@situacion,@exclusividad,@papeles_estado,@fotos,@url_publicacion,@url_instagram,@publicado_en,@ingresada_en)`);
 const insO = db.prepare(`INSERT INTO operacion (id,embarcacion_id,comprador_id,vendedor_id,precio_cierre,etapa,fecha_primer_contacto,fecha_cierre,operacion_vinculada_id) VALUES (?,?,?,?,?,?,?,?,?)`);
@@ -39,7 +39,7 @@ function busqueda(o) {
     presupuesto_min: null, presupuesto_max: null, motor_tipo: 'indistinto', hp_min: null,
     uso_declarado: '["paseo familiar"]', necesita_bano: 0, necesita_trailer: 0, urgencia: 'en los próximos meses',
     entrega_algo: 0, limitacion_declarada: null, estado: 'activa', motivo_cierre: null, texto_original: null,
-    creada_en: dias(60), actualizada_en: null
+    creada_en: dias(60), actualizada_en: null, modelo_referencia: null, marcas_preferidas: '[]'
   }, o);
   insB.run(b); return b;
 }
@@ -400,7 +400,7 @@ traspaso.run(sergio.id, qs1700b.id);           // la Quicksilver 1700 la compró
 
 /* ============================== BÚSQUEDAS ============================== */
 // CASO 1 — Carla buscó una Quicksilver 1700 hace 4 meses y no había
-const bCarla = busqueda({ persona_id: carla.id, tipo_embarcacion: '["lancha open"]', eslora_min: 4.8, eslora_max: 5.8, presupuesto_min: 15000, presupuesto_max: 25000, hp_min: 80, motor_tipo: 'fuera de borda', uso_declarado: '["paseo familiar"]', necesita_trailer: 1, urgencia: 'en los próximos meses', creada_en: dias(130), texto_original: 'Hola! Vi la Quicksilver 1700 que tenían publicada, sigue disponible? Buscamos algo así, hasta 25 mil dólares, con trailer si se puede.' });
+const bCarla = busqueda({ persona_id: carla.id, modelo_referencia: 'Quicksilver 1700', marcas_preferidas: '["Quicksilver"]', tipo_embarcacion: '["lancha open"]', eslora_min: 4.8, eslora_max: 5.8, presupuesto_min: 15000, presupuesto_max: 25000, hp_min: 80, motor_tipo: 'fuera de borda', uso_declarado: '["paseo familiar"]', necesita_trailer: 1, urgencia: 'en los próximos meses', creada_en: dias(130), texto_original: 'Hola! Vi la Quicksilver 1700 que tenían publicada, sigue disponible? Buscamos algo así, hasta 25 mil dólares, con trailer si se puede.' });
 const bGustavo = busqueda({ persona_id: gustavo.id, tipo_embarcacion: '["lancha open","semirrigido/tracker"]', eslora_min: 5.0, eslora_max: 6.2, presupuesto_min: 15000, presupuesto_max: 26000, hp_min: 90, uso_declarado: '["pesca"]', urgencia: 'en los próximos meses', creada_en: dias(90), limitacion_declarada: 'El tracker que tenía le quedaba chico para el río abierto' });
 busqueda({ persona_id: flor.id, tipo_embarcacion: '["lancha open"]', eslora_min: 5.0, eslora_max: 6.0, presupuesto_min: 18000, presupuesto_max: 28000, uso_declarado: '["paseo familiar"]', urgencia: 'ya', creada_en: dias(40) });
 busqueda({ persona_id: diego.id, tipo_embarcacion: '["lancha open"]', eslora_min: 5.2, eslora_max: 6.5, presupuesto_min: 20000, presupuesto_max: 35000, hp_min: 115, uso_declarado: '["wakeboard/deportes","paseo familiar"]', urgencia: 'ya', creada_en: dias(25), limitacion_declarada: 'Necesita torre o al menos potencia para wake' });

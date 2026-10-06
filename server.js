@@ -3,12 +3,20 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const { db, uid, now, normalizarTelefono, auditar } = require('./db');
-const { candidatosParaEmbarcacion, candidatasParaBusqueda, propuestaPuntual } = require('./lib/matching');
+const { candidatosParaEmbarcacion, candidatasParaBusqueda, propuestaPuntual, analizarEmbarcacion } = require('./lib/matching');
+const eventos = require('./lib/eventos');
+const automatizaciones = require('./lib/automatizaciones');
+const intake = require('./lib/intake/nucleo');
+const canalesIntake = require('./lib/intake/canales');
+const whatsappCloud = require('./lib/intake/whatsapp-cloud');
+const { FOTOS_DIR } = require('./lib/intake/fotos');
 const { scoreUpgrade } = require('./lib/escalera');
 const { extraer } = require('./lib/extraccion');
 const { tasar } = require('./lib/tasador');
 const prometheo = require('./lib/prometheo');
 const gcal = require('./lib/gcal');
+const { upsertPersona, agregarRol } = require('./lib/personas');
+const { modoEnvio, envioPrevisto, aprobarPropuesta, descartarPropuesta } = require('./lib/propuestas');
 
 // En un deploy nuevo la base arranca vacía (el .db no viaja en el repo):
 // se siembran los datos de demo una sola vez, al primer arranque.
@@ -22,55 +30,16 @@ try {
 }
 
 const app = express();
-app.use(express.json());
+// Body crudo guardado para verificar la firma de los webhooks (Meta firma el body tal cual llegó)
+app.use(express.json({ limit: '25mb', verify: (req, _res, buf) => { req.rawBody = buf; } }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/fotos', express.static(FOTOS_DIR, { maxAge: '7d' }));
 
 const j = (s, d = []) => { try { return JSON.parse(s) || d; } catch { return d; } };
 const horas = (iso) => (Date.now() - new Date(iso).getTime()) / 36e5;
 
 // Vista pública de embarcación: precio_minimo_aceptado NUNCA sale (§4.4)
 function embPublica(e) { if (!e) return e; const { precio_minimo_aceptado, ...rest } = e; return rest; }
-
-/* ============ Deduplicación en el borde (§1.bis regla 5) ============ */
-function upsertPersona({ nombre, telefono, email, instagram_handle, prometheo_id, origen, contexto_personal }) {
-  const tel = normalizarTelefono(telefono);
-  let p = null;
-  if (tel) p = db.prepare('SELECT * FROM persona WHERE telefono = ?').get(tel);
-  if (!p && instagram_handle) p = db.prepare('SELECT * FROM persona WHERE instagram_handle = ?').get(instagram_handle);
-  if (p) {
-    db.prepare(`UPDATE persona SET
-      nombre = CASE WHEN nombre = '' OR nombre IS NULL THEN COALESCE(?, nombre) ELSE nombre END,
-      telefono = COALESCE(telefono, ?), email = COALESCE(email, ?),
-      instagram_handle = COALESCE(instagram_handle, ?), prometheo_id = COALESCE(prometheo_id, ?),
-      contexto_personal = COALESCE(?, contexto_personal), ultima_interaccion = ?
-      WHERE id = ?`)
-      .run(nombre || null, tel, email || null, instagram_handle || null, prometheo_id || null, contexto_personal || null, now(), p.id);
-    return { persona: db.prepare('SELECT * FROM persona WHERE id = ?').get(p.id), creada: false };
-  }
-  const id = uid();
-  db.prepare(`INSERT INTO persona (id,nombre,telefono,email,instagram_handle,prometheo_id,origen,roles,estado,contexto_personal,no_contactar,creado_en,ultima_interaccion)
-    VALUES (?,?,?,?,?,?,?,?,?,?,0,?,?)`)
-    .run(id, nombre || 'Sin nombre', tel, email || null, instagram_handle || null, prometheo_id || null, origen || 'otro', '["comprador"]', 'activo', contexto_personal || null, now(), now());
-  auditar(id, 'alta de persona', `origen: ${origen || 'otro'}`, 'sistema');
-  return { persona: db.prepare('SELECT * FROM persona WHERE id = ?').get(id), creada: true };
-}
-
-function agregarRol(personaId, rol) {
-  const p = db.prepare('SELECT roles FROM persona WHERE id = ?').get(personaId);
-  const roles = j(p.roles);
-  if (!roles.includes(rol)) { roles.push(rol); db.prepare('UPDATE persona SET roles = ? WHERE id = ?').run(JSON.stringify(roles), personaId); }
-}
-
-/* ============ Ventana de 24 hs de WhatsApp (§1.bis regla 7) ============ */
-// Leandro nunca debe necesitar saber que esta regla existe: el sistema decide solo.
-function modoEnvio(personaId) {
-  const ultimo = db.prepare(`
-    SELECT m.timestamp FROM mensaje m JOIN conversacion c ON c.id = m.conversacion_id
-    WHERE c.persona_id = ? AND m.direccion = 'entrante' AND c.canal = 'whatsapp'
-    ORDER BY m.timestamp DESC LIMIT 1`).get(personaId);
-  if (ultimo && horas(ultimo.timestamp) < 24) return { modo: 'texto libre', detalle: 'ventana de 24 hs activa' };
-  return { modo: 'plantilla', detalle: 'fuera de ventana — sale como plantilla match_inventario aprobada por Meta' };
-}
 
 /* ============================== HOY ============================== */
 app.get('/api/hoy', (req, res) => {
@@ -266,16 +235,20 @@ app.post('/api/busquedas', (req, res) => {
     origen: b.origen || 'telefono', contexto_personal: b.contexto_personal,
   });
   const id = uid();
-  db.prepare(`INSERT INTO busqueda (id,persona_id,tipo_embarcacion,eslora_min,eslora_max,presupuesto_min,presupuesto_max,motor_tipo,hp_min,uso_declarado,necesita_bano,necesita_trailer,urgencia,entrega_algo,limitacion_declarada,estado,texto_original,creada_en)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+  db.prepare(`INSERT INTO busqueda (id,persona_id,tipo_embarcacion,eslora_min,eslora_max,presupuesto_min,presupuesto_max,motor_tipo,hp_min,uso_declarado,necesita_bano,necesita_trailer,urgencia,entrega_algo,limitacion_declarada,estado,texto_original,creada_en,modelo_referencia,marcas_preferidas)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
     .run(id, p.id, JSON.stringify(b.tipo_embarcacion || []), b.eslora_min ?? null, b.eslora_max ?? null,
       b.presupuesto_min ?? null, b.presupuesto_max ?? null, b.motor_tipo || 'indistinto', b.hp_min ?? null,
       JSON.stringify(b.uso_declarado || []), b.necesita_bano ? 1 : 0, b.necesita_trailer ? 1 : 0,
-      b.urgencia || null, b.entrega_algo ? 1 : 0, b.limitacion_declarada || null, 'activa', b.texto_original || null, now());
+      b.urgencia || null, b.entrega_algo ? 1 : 0, b.limitacion_declarada || null, 'activa', b.texto_original || null, now(),
+      b.modelo_referencia || null, JSON.stringify(b.marcas_preferidas || []));
   auditar(p.id, 'alta de búsqueda', `${(b.tipo_embarcacion || []).join(', ')} · hasta USD ${b.presupuesto_max || 's/d'}`, b.autor || 'leandro');
   // devolución a Prometheo: variables deducidas al lead (§1.bis tabla)
   if (p.prometheo_id) prometheo.escribirVariablesEnLead(p.prometheo_id, { busca: (b.tipo_embarcacion || []).join('/'), presupuesto_max: b.presupuesto_max });
-  res.json({ ok: true, busqueda_id: id, persona_id: p.id, persona_creada: creada, persona_nombre: p.nombre });
+  // qué barcos del stock ya le sirven: quedan como propuestas pendientes de aprobación
+  const ev = eventos.emitir('busqueda.creada', id, {});
+  const propuestas = (ev.resultado && ev.resultado.matching) || [];
+  res.json({ ok: true, busqueda_id: id, persona_id: p.id, persona_creada: creada, persona_nombre: p.nombre, propuestas });
 });
 
 // Cierre de búsqueda: nunca se borra, se cierra con motivo (§3.2)
@@ -317,8 +290,9 @@ app.get('/api/embarcaciones/:id', (req, res) => {
     SELECT c.id, c.canal, c.ultima_actividad, p.nombre, p.id AS persona_id
     FROM conversacion c JOIN persona p ON p.id = c.persona_id
     WHERE c.embarcacion_referida_id = ? ORDER BY c.ultima_actividad DESC`).all(e.id);
-  const candidatos = e.situacion === 'en venta' ? candidatosParaEmbarcacion(e.id) : [];
-  res.json({ ...e, equipamiento: j(e.equipamiento), fotos: j(e.fotos), propietario, consultas, candidatos });
+  const analisis = e.situacion === 'en venta' ? analizarEmbarcacion(e.id) : { candidatos: [], casi: [], umbrales: [] };
+  res.json({ ...e, equipamiento: j(e.equipamiento), fotos: j(e.fotos), propietario, consultas,
+    candidatos: analisis.candidatos, casi: analisis.casi.map(c => ({ persona_id: c.persona_id, nombre: c.nombre, precioQueEntra: c.precioQueEntra, motivo: c.motivo, descartes: c.descartes })), umbrales: analisis.umbrales });
 });
 
 // Alta de embarcación → matching inmediato → propuestas pendientes de aprobación (Caso 1)
@@ -338,12 +312,10 @@ app.post('/api/embarcaciones', (req, res) => {
       JSON.stringify(b.equipamiento || []), b.estado_general || null, b.tiene_bano ? 1 : 0, b.tiene_trailer ? 1 : 0,
       b.precio_pedido ?? null, b.precio_minimo_aceptado ?? null, propietarioId, 'en venta', b.exclusividad || 'a confirmar', b.papeles_estado || 'sin revisar', now());
 
-  // el corazón del Caso 1: candidatos + borrador por cada uno, pendientes de aprobación
-  const candidatos = candidatosParaEmbarcacion(id);
-  const insProp = db.prepare(`INSERT INTO propuesta (id,embarcacion_id,busqueda_id,persona_id,puntaje,motivo,mensaje_borrador,via,estado,creada_en) VALUES (?,?,?,?,?,?,?,?,?,?)`);
-  for (const c of candidatos) {
-    insProp.run(uid(), id, c.busqueda.id, c.persona_id, c.puntaje, c.motivo, c.mensaje_borrador, c.via, 'pendiente', now());
-  }
+  db.prepare('UPDATE embarcacion SET cargada_por = ? WHERE id = ?').run('Leandro · formulario', id);
+  // el corazón del Caso 1: el evento dispara el matching y el aviso (mismo camino que WhatsApp)
+  const ev = eventos.emitir('embarcacion.publicada', id, { canal: 'web' });
+  const candidatos = (ev.resultado && ev.resultado.matching) || [];
   res.json({ ok: true, embarcacion_id: id, candidatos: candidatos.length });
 });
 
@@ -357,35 +329,13 @@ app.get('/api/embarcaciones/:id/propuestas', (req, res) => {
 });
 
 app.post('/api/propuestas/:id/aprobar', (req, res) => {
-  const pr = db.prepare('SELECT * FROM propuesta WHERE id = ?').get(req.params.id);
-  if (!pr) return res.status(404).json({ error: 'no existe' });
-  const contenido = (req.body && req.body.mensaje) || pr.mensaje_borrador;
-  const editada = contenido !== pr.mensaje_borrador;
-  const persona = db.prepare('SELECT * FROM persona WHERE id = ?').get(pr.persona_id);
-
-  let envio;
-  if (pr.via === 'whatsapp') {
-    envio = modoEnvio(pr.persona_id); // ventana 24 hs: el sistema decide solo
-    prometheo.enviarWhatsApp(persona.telefono, contenido, envio.modo);
-    // registrar el saliente en la conversación de WhatsApp de la persona
-    let conv = db.prepare(`SELECT id FROM conversacion WHERE persona_id = ? AND canal = 'whatsapp' ORDER BY ultima_actividad DESC LIMIT 1`).get(pr.persona_id);
-    if (!conv) { const cid = uid(); db.prepare(`INSERT INTO conversacion (id,persona_id,canal,estado,embarcacion_referida_id,ultima_actividad) VALUES (?,?,?,?,?,?)`).run(cid, pr.persona_id, 'whatsapp', 'esperando respuesta de él', pr.embarcacion_id, now()); conv = { id: cid }; }
-    db.prepare(`INSERT INTO mensaje (id,conversacion_id,direccion,contenido,timestamp,autor) VALUES (?,?,?,?,?,?)`).run(uid(), conv.id, 'saliente', contenido, now(), 'leandro');
-    db.prepare(`UPDATE conversacion SET ultima_actividad = ?, estado = 'esperando respuesta de él' WHERE id = ?`).run(now(), conv.id);
-  } else {
-    envio = { modo: 'copy-paste', detalle: 'tarea generada: pegar el mensaje en la bandeja de Prometheo (Instagram)' };
-  }
-  db.prepare(`UPDATE propuesta SET estado = ?, resuelta_en = ? WHERE id = ?`).run(editada ? 'editada-y-aprobada' : 'aprobada', now(), pr.id);
-  auditar(pr.persona_id, 'mensaje de matching aprobado', `vía ${pr.via} · ${envio.modo}`, 'leandro');
-  res.json({ ok: true, envio });
+  try { res.json(aprobarPropuesta(req.params.id, { mensaje: req.body && req.body.mensaje, autor: 'leandro' })); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 
 app.post('/api/propuestas/:id/descartar', (req, res) => {
-  const pr = db.prepare('SELECT * FROM propuesta WHERE id = ?').get(req.params.id);
-  if (!pr) return res.status(404).json({ error: 'no existe' });
-  db.prepare(`UPDATE propuesta SET estado = 'descartada', resuelta_en = ? WHERE id = ?`).run(now(), pr.id);
-  auditar(pr.persona_id, 'propuesta de matching descartada', null, 'leandro');
-  res.json({ ok: true });
+  try { res.json(descartarPropuesta(req.params.id, { autor: 'leandro' })); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
 });
 
 /* ============================== TASADOR (Caso 2) ============================== */
@@ -569,8 +519,95 @@ app.delete('/api/citas/:id', (req, res) => {
   res.json({ ok: true });
 });
 
+/* ============================== PRECIO (dispara re-matching) ============================== */
+app.patch('/api/embarcaciones/:id/precio', (req, res) => {
+  const e = db.prepare('SELECT * FROM embarcacion WHERE id = ?').get(req.params.id);
+  if (!e) return res.status(404).json({ error: 'no existe' });
+  const precio = parseInt(req.body && req.body.precio, 10);
+  if (!precio || precio < 1000) return res.status(400).json({ error: 'precio inválido' });
+  db.prepare('UPDATE embarcacion SET precio_pedido = ? WHERE id = ?').run(precio, e.id);
+  auditar(e.propietario_id, 'cambio de precio', `${e.marca} ${e.modelo}: USD ${e.precio_pedido} → USD ${precio}`, 'leandro');
+  let propuestas = [];
+  if (e.precio_pedido && precio < e.precio_pedido) {
+    const ev = eventos.emitir('embarcacion.precio_bajado', e.id, { precio_anterior: e.precio_pedido, precio_nuevo: precio });
+    propuestas = (ev.resultado && ev.resultado.matching) || [];
+  }
+  res.json({ ok: true, precio_anterior: e.precio_pedido, precio, propuestas,
+    debajoDelMinimo: !!(e.precio_minimo_aceptado && precio < e.precio_minimo_aceptado), minimo: e.precio_minimo_aceptado });
+});
+
+app.patch('/api/embarcaciones/:id/minimo', (req, res) => {
+  const e = db.prepare('SELECT * FROM embarcacion WHERE id = ?').get(req.params.id);
+  if (!e) return res.status(404).json({ error: 'no existe' });
+  const minimo = parseInt(req.body && req.body.minimo, 10);
+  if (!minimo || minimo < 1000) return res.status(400).json({ error: 'mínimo inválido' });
+  db.prepare('UPDATE embarcacion SET precio_minimo_aceptado = ? WHERE id = ?').run(minimo, e.id);
+  auditar(e.propietario_id, 'cambio de precio mínimo (privado)', `${e.marca} ${e.modelo}: USD ${e.precio_minimo_aceptado || 's/d'} → USD ${minimo}`, 'leandro');
+  res.json({ ok: true });
+});
+
+/* ============================== ACTIVIDAD DEL MOTOR ============================== */
+app.get('/api/eventos', (req, res) => {
+  const rows = eventos.recientes(parseInt(req.query.limite, 10) || 20).map(ev => {
+    const e = ev.tipo.startsWith('embarcacion') ? db.prepare('SELECT marca, modelo, anio FROM embarcacion WHERE id = ?').get(ev.entidad_id) : null;
+    const b = ev.tipo.startsWith('busqueda') ? db.prepare('SELECT p.nombre FROM busqueda b JOIN persona p ON p.id = b.persona_id WHERE b.id = ?').get(ev.entidad_id) : null;
+    return { ...ev, etiqueta: e ? `${e.marca} ${e.modelo} ${e.anio || ''}`.trim() : b ? `búsqueda de ${b.nombre}` : ev.entidad_id,
+      propuestas: Array.isArray(ev.resultado.matching) ? ev.resultado.matching.length : 0 };
+  });
+  res.json(rows);
+});
+
+/* ============================== CARGA POR WHATSAPP ============================== */
+// Simulador del CRM: mismo núcleo que el WhatsApp real, con el operador 'sim:leandro'
+app.post('/api/intake/simulador', async (req, res) => {
+  const b = req.body || {};
+  try {
+    const r = await intake.procesarMensaje({
+      canal: 'simulador', operadorTel: 'sim:leandro', texto: b.texto || '',
+      medios: (b.fotos || []).map(dataUrl => ({ tipo: 'imagen', dataUrl })),
+    });
+    res.json(r);
+  } catch (e) { console.error(e); res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/intake/conversacion', (req, res) => res.json(canalesIntake.conversacion(req.query.tel || 'sim:leandro')));
+
+app.post('/api/intake/reiniciar', (req, res) => {
+  const tel = 'sim:leandro';
+  db.prepare('DELETE FROM intake_mensaje WHERE operador_tel = ?').run(tel);
+  db.prepare("UPDATE borrador_embarcacion SET estado = 'cancelado' WHERE operador_tel = ? AND estado = 'abierto'").run(tel);
+  db.prepare('DELETE FROM operador_contexto WHERE operador_tel = ?').run(tel);
+  res.json({ ok: true });
+});
+
+app.get('/api/intake/borradores', (req, res) => {
+  res.json(db.prepare(`SELECT b.*, o.nombre AS operador FROM borrador_embarcacion b LEFT JOIN operador o ON o.telefono = b.operador_tel
+    ORDER BY b.actualizado_en DESC LIMIT 30`).all().map(b => ({ ...b, datos: j(b.datos, {}), fotos: j(b.fotos, []) })));
+});
+
+// Quiénes pueden cargar por WhatsApp
+app.get('/api/operadores', (req, res) => res.json(db.prepare('SELECT * FROM operador ORDER BY creado_en').all()));
+app.post('/api/operadores', (req, res) => {
+  const { telefono, nombre } = req.body || {};
+  const tel = normalizarTelefono(telefono);
+  if (!tel || !nombre) return res.status(400).json({ error: 'faltan teléfono o nombre' });
+  db.prepare(`INSERT INTO operador (telefono, nombre, activo, creado_en) VALUES (?,?,1,?)
+    ON CONFLICT(telefono) DO UPDATE SET nombre = excluded.nombre, activo = 1`).run(tel, nombre, now());
+  res.json({ ok: true, telefono: tel });
+});
+app.delete('/api/operadores/:tel', (req, res) => {
+  db.prepare('UPDATE operador SET activo = 0 WHERE telefono = ?').run(req.params.tel);
+  res.json({ ok: true });
+});
+
+// WhatsApp Cloud API (Meta): verificación + mensajes entrantes
+whatsappCloud.montar(app);
+
 // Tasador público como página propia
 app.get('/tasador', (req, res) => res.sendFile(path.join(__dirname, 'public', 'tasador.html')));
+
+automatizaciones.registrar();
+whatsappCloud.iniciar();
 
 const PORT = process.env.PORT || 3411;
 app.listen(PORT, () => console.log(`CRM Náutico demo — http://localhost:${PORT}  ·  tasador público: /tasador`));

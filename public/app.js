@@ -46,9 +46,13 @@ document.querySelectorAll('.nav-item[data-ruta]').forEach(n => n.onclick = () =>
 /* ==================== HOY · AGENDA (unificadas) ==================== */
 rutas.hoy = async () => {
   vista.innerHTML = '<div class="cargando">Cargando…</div>';
-  const [d, citas, personas, embarcaciones] = await Promise.all([
-    api('/api/hoy'), api('/api/agenda'), api('/api/personas'), api('/api/embarcaciones'),
+  const [d, citas, personas, embarcaciones, actividad] = await Promise.all([
+    api('/api/hoy'), api('/api/agenda'), api('/api/personas'), api('/api/embarcaciones'), api('/api/eventos?limite=8'),
   ]);
+  const ETIQUETA_EVENTO = {
+    'embarcacion.publicada': ['📥', 'Entró al inventario'], 'embarcacion.precio_bajado': ['📉', 'Bajó de precio'],
+    'busqueda.creada': ['🔎', 'Nueva búsqueda'], 'busqueda.reabierta': ['🔁', 'Búsqueda reabierta'],
+  };
   const badge = document.getElementById('badge-hoy');
   const pendientes = d.sinResponder.length + d.propuestas.length;
   badge.hidden = !pendientes; badge.textContent = pendientes;
@@ -109,6 +113,14 @@ rutas.hoy = async () => {
           <div class="detalle" style="color:${c.semaforo === 'rojo' ? 'var(--rojo)' : 'var(--gris-claro)'}">Tu toque personal pendiente hace ${c.horas_sin_responder < 24 ? c.horas_sin_responder + ' hs' : plural(Math.round(c.horas_sin_responder / 24), 'día', 'días')} — respondé desde Prometheo</div>
         </div>
       </div>`).join('') : '<div class="vacio">Nada pendiente. 👌</div>'}
+
+    ${actividad.length ? `<h2>Actividad del motor de coincidencias</h2>
+      <div class="card actividad">${actividad.map(ev => {
+        const [ic, txt] = ETIQUETA_EVENTO[ev.tipo] || ['•', ev.tipo];
+        const link = ev.tipo.startsWith('embarcacion') ? `#/embarcacion/${ev.entidad_id}` : '#/busquedas';
+        return `<a class="act-fila" href="${link}"><span class="act-ic">${ic}</span><span><b>${txt}:</b> ${esc(ev.etiqueta)}${ev.datos.precio_nuevo ? ` → USD ${Number(ev.datos.precio_nuevo).toLocaleString('es-AR')}` : ''}${ev.datos.canal ? ` <span class="chip gris">${esc(ev.datos.canal)}</span>` : ''}</span>
+          <span class="act-res">${ev.propuestas ? ev.propuestas + ' propuesta' + (ev.propuestas > 1 ? 's' : '') : 'sin coincidencias'} · ${haceCuanto(ev.creado_en)}</span></a>`;
+      }).join('')}</div>` : ''}
 
     <h2 id="agenda" style="margin-top:34px;padding-top:22px;border-top:1px solid var(--borde)">
       Agenda <span class="chip verde" style="vertical-align:middle">✓ sincronizada con Google Calendar</span>
@@ -596,7 +608,10 @@ rutas.inventario = async () => {
     </div>`;
 
   vista.innerHTML = `
-    <h1>Inventario <span style="color:var(--gris-claro);font-weight:400;font-size:1rem">— ${enVenta.length} en venta</span></h1>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <h1>Inventario <span style="color:var(--gris-claro);font-weight:400;font-size:1rem">— ${enVenta.length} en venta</span></h1>
+      <div style="display:flex;gap:8px"><a class="btn sec mini" href="#/carga">📱 Cargar por WhatsApp</a><a class="btn mini" href="#/alta-embarcacion">+ Cargar con formulario</a></div>
+    </div>
     <p class="sub">Cada lancha muestra dónde está publicada. Las que llevan más de 120 días en stock salen marcadas.</p>
     ${sinPublicar.length ? `<div class="alerta-card" style="border-left:4px solid var(--rojo)">
       <div style="font-size:1.3rem">📣</div>
@@ -630,7 +645,7 @@ rutas.embarcacion = async (id) => {
   vista.innerHTML = `
     <a class="volver" href="#/inventario">← Inventario</a>
     <h1>${esc(e.marca)} ${esc(e.modelo)} ${e.anio || ''} <span class="chip ${e.situacion === 'en venta' ? 'verde' : 'gris'}">${esc(e.situacion)}</span></h1>
-    <p class="sub">${esc(e.tipo)} · ${e.eslora || '?'} m de eslora${e.manga ? ' × ' + e.manga + ' m' : ''} · ${esc(e.motor_marca || '')} ${e.motor_hp || '?'} HP ${esc(e.motor_tipo || '')} · ${e.motor_horas ?? '?'} horas</p>
+    <p class="sub">${esc(e.tipo)} · ${e.eslora || '?'} m de eslora${e.manga ? ' × ' + e.manga + ' m' : ''} · ${e.cantidad_motores > 1 ? e.cantidad_motores + ' × ' : ''}${esc(e.motor_marca || '')} ${e.motor_hp || '?'} HP ${esc(e.motor_tipo || '')} · ${e.motor_horas ?? '?'} horas${e.cargada_por ? ` · <span class="chip gris">cargada por ${esc(e.cargada_por)}</span>` : ''}</p>
 
     ${(e.fotos && e.fotos.length) ? `<div class="ficha-fotos">
       ${e.fotos.map(f => `<img src="${esc(f)}" alt="${esc(e.marca + ' ' + e.modelo)}">`).join('')}
@@ -656,7 +671,8 @@ rutas.embarcacion = async (id) => {
         <strong style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--azul)">Ficha</strong>
         <table style="margin-top:8px">
           <tr><td style="color:var(--gris)">Precio pedido</td><td style="font-weight:600">${usd(e.precio_pedido)}</td></tr>
-          ${e.precio_minimo_aceptado ? `<tr><td style="color:var(--gris)">Mínimo aceptado <span class="chip amarillo">privado</span></td><td>${usd(e.precio_minimo_aceptado)}</td></tr>` : ''}
+          ${e.precio_minimo_aceptado ? `<tr><td style="color:var(--gris)">Mínimo aceptado <span class="chip amarillo">privado</span></td><td>${usd(e.precio_minimo_aceptado)}
+            ${e.precio_pedido && e.precio_pedido < e.precio_minimo_aceptado ? `<div class="aviso-minimo">⚠️ El precio pedido quedó por debajo del mínimo del dueño. <a href="#" id="ajustar-minimo">Si lo autorizó, igualarlo a ${usd(e.precio_pedido)}</a></div>` : ''}</td></tr>` : ''}
           ${e.precio_venta_real ? `<tr><td style="color:var(--gris)">Venta real</td><td>${usd(e.precio_venta_real)}</td></tr>` : ''}
           <tr><td style="color:var(--gris)">Estado</td><td>${esc(e.estado_general || '—')}</td></tr>
           <tr><td style="color:var(--gris)">Baño / Trailer</td><td>${e.tiene_bano ? 'baño ✓' : 'sin baño'} · ${e.tiene_trailer ? 'trailer ✓' : 'sin trailer'}</td></tr>
@@ -678,6 +694,31 @@ rutas.embarcacion = async (id) => {
       </div>
     </div>
 
+    ${e.situacion === 'en venta' ? `
+      <div class="card precio-card">
+        <div>
+          <strong style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--azul)">Precio pedido</strong>
+          <div style="font-size:1.3rem;font-weight:700;color:var(--azul);margin-top:2px">${usd(e.precio_pedido)}</div>
+          <div style="font-size:0.78rem;color:var(--gris)">Si baja, el motor vuelve a cruzar todas las búsquedas: suma a los que ahora entran y les avisa a los que ya la tenían.</div>
+        </div>
+        <form id="form-precio" style="display:flex;gap:8px;align-items:center">
+          <input type="number" name="precio" placeholder="Nuevo precio" step="500" min="1000" style="width:150px" required>
+          <button class="btn mini" type="submit">Actualizar</button>
+        </form>
+      </div>
+      ${e.umbrales && e.umbrales.length ? `
+        <div class="card casi-card">
+          <strong style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--amarillo-osc, #a3720e)">💡 Para negociar con el dueño — compradores que entran si baja el precio</strong>
+          <div class="escalones">
+            ${e.umbrales.map(u => `
+              <div class="escalon">
+                <div class="escalon-precio">${usd(u.precio)}</div>
+                <div class="escalon-txt">se ${u.se_suman === 1 ? 'suma 1' : 'suman ' + u.se_suman} <span style="color:var(--gris)">(${u.total} en total)</span></div>
+                <div class="escalon-nombres">${u.nombres.map(esc).join(', ')}</div>
+              </div>`).join('')}
+          </div>
+        </div>` : ''}` : ''}
+
     ${pendientes.length ? `
       <h2>A quién le sirve — ${pendientes.length} candidato${pendientes.length > 1 ? 's' : ''} esperando tu aprobación</h2>
       <p class="sub" style="margin-bottom:14px">El sistema nunca envía solo: aprobás, editás o descartás. En USD 30.000 el contacto personal es el activo.</p>
@@ -692,6 +733,7 @@ rutas.embarcacion = async (id) => {
             <span style="color:var(--gris);font-size:0.8rem">${esc(c.telefono || c.instagram_handle || '')}</span>
           </div>
           <div class="motivo">${esc(c.motivo)}</div>
+          ${factoresHtml(c.factores)}
         </div>`).join('')}` : ''}
 
     ${resueltas.length ? `<h2>Propuestas resueltas</h2>${resueltas.map(p => `
@@ -703,7 +745,35 @@ rutas.embarcacion = async (id) => {
       </div>`).join('')}` : ''}
   `;
   wirePropuestas();
+  const am = document.getElementById('ajustar-minimo');
+  if (am) am.onclick = async (ev) => {
+    ev.preventDefault();
+    await api(`/api/embarcaciones/${id}/minimo`, { method: 'PATCH', body: { minimo: e.precio_pedido } });
+    toast('Mínimo actualizado (queda registrado en la auditoría).');
+    rutas.embarcacion(id);
+  };
+  const fp = document.getElementById('form-precio');
+  if (fp) fp.onsubmit = async (ev) => {
+    ev.preventDefault();
+    const precio = parseInt(fp.precio.value, 10);
+    const r = await api(`/api/embarcaciones/${id}/precio`, { method: 'PATCH', body: { precio } });
+    if (r.debajoDelMinimo) setTimeout(() => toast(`⚠️ Quedó por debajo del mínimo que aceptaba el dueño (${usd(r.minimo)}). Revisalo en la ficha.`), 4300);
+    toast(precio < r.precio_anterior
+      ? `Precio actualizado. ${r.propuestas.length ? r.propuestas.length + ' propuesta' + (r.propuestas.length > 1 ? 's' : '') + ' nueva' + (r.propuestas.length > 1 ? 's' : '') + ' para aprobar.' : 'Con este precio no se suma nadie nuevo.'}`
+      : 'Precio actualizado.');
+    rutas.embarcacion(id);
+  };
 };
+
+/** "¿Por qué N puntos?" — el desglose que arma el motor, para que el puntaje no sea una caja negra. */
+function factoresHtml(factores) {
+  let lista = factores;
+  if (typeof lista === 'string') { try { lista = JSON.parse(lista); } catch { lista = []; } }
+  if (!lista || !lista.length) return '';
+  return `<details class="factores"><summary>¿Por qué ${lista.reduce((a, f) => a + f.puntos, 0)} puntos?</summary>
+    ${lista.map(f => `<div class="factor"><span class="factor-pts ${f.puntos < 0 ? 'neg' : ''}">${f.puntos > 0 ? '+' : ''}${f.puntos}</span>${esc(f.texto)}</div>`).join('')}
+  </details>`;
+}
 
 function propuestaHtml(p) {
   return `
@@ -713,9 +783,11 @@ function propuestaHtml(p) {
         <strong style="font-size:1rem"><a href="#/persona/${p.persona_id}">${esc(p.nombre)}</a></strong>
         <span style="color:var(--gris);font-size:0.82rem">${esc(p.telefono || p.instagram_handle || '')}</span>
         ${p.via === 'copy-paste' ? '<span class="chip amarillo">sin teléfono → tarea copy-paste</span>' : ''}
+        ${p.origen === 'precio_bajado' ? '<span class="chip rojo">bajó de precio</span>' : p.origen === 'busqueda_nueva' ? '<span class="chip">búsqueda nueva</span>' : ''}
       </div>
       ${p.contexto_personal ? `<div style="font-size:0.8rem;color:var(--gris);margin-top:4px">${esc(p.contexto_personal)}</div>` : ''}
       <div class="motivo"><strong>Por qué:</strong> ${esc(p.motivo)}</div>
+      ${factoresHtml(p.factores)}
       <textarea rows="5">${esc(p.mensaje_borrador)}</textarea>
       <div class="acciones-prop">
         <button class="btn mini aprobar">Aprobar y enviar</button>
@@ -741,6 +813,144 @@ function wirePropuestas() {
     };
   });
 }
+
+/* ==================== CARGA POR WHATSAPP (simulador) ==================== */
+const EJEMPLOS_CARGA = [
+  ['Cargar una unidad', 'Entró una Quicksilver 1800 del 2017, Mercury 115 con 400 hs, con trailer, impecable. Pide 23.500, acepta 22 lucas. Dueño Juan Pérez 11 5555 1234'],
+  ['Completar lo que falta', 'es open'],
+  ['Publicar', 'LISTO'],
+  ['Enviar a los elegidos', '1'],
+  ['Bajar un precio', 'la Klase A 2400 bajó a 52 lucas'],
+  ['Marcar una venta', 'se vendió la Paglietini 620'],
+  ['Ver comandos', 'AYUDA'],
+];
+
+/** Achica la foto en el navegador antes de mandarla (una foto de celular pesa 3-5 MB). */
+function fotoADataUrl(file, max = 1280) {
+  return new Promise((ok, mal) => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(img.src);
+      ok(c.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = mal;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+const horaCorta = (iso) => new Date(iso).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+rutas.carga = async () => {
+  vista.innerHTML = '<div class="cargando">Cargando…</div>';
+  const [conv, borradores, operadores] = await Promise.all([
+    api('/api/intake/conversacion?tel=sim:leandro'), api('/api/intake/borradores'), api('/api/operadores'),
+  ]);
+  let fotosPendientes = [];
+
+  const burbujas = (msgs) => msgs.length ? msgs.map(m => `
+    <div class="wa-msg ${m.direccion === 'entrante' ? 'yo' : 'bot'}">
+      ${(m.medios || []).filter(x => x.url).map(x => `<img src="${esc(x.url)}" alt="">`).join('')}
+      ${(m.medios || []).some(x => x.tipo === 'imagen' && !x.url) ? '<div class="wa-foto-ph">📷 foto</div>' : ''}
+      ${m.texto ? `<div class="wa-txt">${esc(m.texto)}</div>` : ''}
+      <div class="wa-hora">${horaCorta(m.timestamp)}${m.direccion === 'entrante' ? ' ✓✓' : ''}</div>
+    </div>`).join('')
+    : '<div class="wa-vacio">Escribile como le escribirías a alguien del equipo.<br>Probá con los ejemplos de la derecha →</div>';
+
+  vista.innerHTML = `
+    <h1>Carga por WhatsApp</h1>
+    <p class="sub">Leandro está en la guardería frente a un barco que acaba de tomar: le saca fotos y lo manda por WhatsApp como le sale. El sistema arma la ficha, pregunta lo que falta, la publica cuando él confirma y le contesta al toque a quién le sirve. Este simulador usa exactamente el mismo motor que el número real.</p>
+    <div class="carga-layout">
+      <div class="wa-telefono">
+        <div class="wa-header">
+          <div class="wa-avatar"><img src="/img/logo.png" alt=""></div>
+          <div><div class="wa-nombre">Asistente de carga · CRM</div><div class="wa-estado">en línea</div></div>
+        </div>
+        <div class="wa-chat" id="wa-chat">${burbujas(conv)}</div>
+        <div class="wa-adjuntos" id="wa-adjuntos" hidden></div>
+        <form class="wa-input" id="wa-form">
+          <label class="wa-clip" title="Adjuntar fotos">📎<input type="file" id="wa-fotos" accept="image/*" multiple hidden></label>
+          <textarea id="wa-texto" rows="1" placeholder="Mensaje"></textarea>
+          <button class="wa-enviar" type="submit" title="Enviar">➤</button>
+        </form>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <strong class="titulo-seccion">Probá con</strong>
+          <div class="ejemplos-carga">${EJEMPLOS_CARGA.map(([t, txt], i) => `
+            <button class="ejemplo-carga" data-i="${i}"><span>${esc(t)}</span><em>${esc(txt.length > 70 ? txt.slice(0, 70) + '…' : txt)}</em></button>`).join('')}
+          </div>
+          <button class="btn fantasma mini" id="wa-reiniciar" style="margin-top:10px">Reiniciar conversación</button>
+        </div>
+        <div class="card" style="margin-bottom:14px">
+          <strong class="titulo-seccion">Qué pasa por detrás</strong>
+          <ol class="pasos-carga">
+            <li><b>Entiende el mensaje</b> (y las fotos, con IA): marca, modelo, año, motor, horas, precio, mínimo privado, dueño.</li>
+            <li><b>Arma un borrador</b> y pide solo lo que falta. Nada se publica sin un LISTO.</li>
+            <li><b>Publica</b> → el evento dispara el motor de coincidencias contra todas las búsquedas activas.</li>
+            <li><b>Contesta a quién le sirve</b>; respondiendo "1 3" se envían esos mensajes (la aprobación sigue siendo de él).</li>
+            <li>Un <b>cambio de precio</b> vuelve a cruzar todo: suma a los que ahora entran y avisa a los que ya la tenían.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <strong class="titulo-seccion">Cargas recientes</strong>
+          ${borradores.length ? `<table style="margin-top:6px">${borradores.slice(0, 8).map(b => `
+            <tr${b.embarcacion_id ? ` class="click" onclick="location.hash='#/embarcacion/${b.embarcacion_id}'"` : ''}>
+              <td>${esc([b.datos.marca, b.datos.modelo, b.datos.anio].filter(Boolean).join(' ') || 'sin datos')}</td>
+              <td><span class="chip ${b.estado === 'publicado' ? 'verde' : b.estado === 'abierto' ? 'amarillo' : 'gris'}">${esc(b.estado)}</span></td>
+              <td style="color:var(--gris)">${esc(b.canal)} · ${haceCuanto(b.actualizado_en)}</td>
+            </tr>`).join('')}</table>` : '<div class="vacio">Todavía no se cargó nada por este canal.</div>'}
+          <div style="font-size:0.78rem;color:var(--gris);margin-top:10px">
+            Números habilitados para cargar: ${operadores.filter(o => o.activo && !o.telefono.startsWith('sim:')).map(o => esc(o.nombre + ' ' + o.telefono)).join(', ') || 'ninguno todavía (se configuran al conectar el número de WhatsApp). Cualquier otro número que escriba es ignorado.'}
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  const chat = document.getElementById('wa-chat');
+  chat.scrollTop = chat.scrollHeight;
+  const form = document.getElementById('wa-form');
+  const input = document.getElementById('wa-texto');
+  const adj = document.getElementById('wa-adjuntos');
+
+  const pintarAdjuntos = () => {
+    adj.hidden = !fotosPendientes.length;
+    adj.innerHTML = fotosPendientes.map((f, i) => `<div class="wa-adj"><img src="${f}"><button type="button" data-i="${i}">×</button></div>`).join('');
+    adj.querySelectorAll('button').forEach(b => b.onclick = () => { fotosPendientes.splice(+b.dataset.i, 1); pintarAdjuntos(); });
+  };
+  document.getElementById('wa-fotos').onchange = async (ev) => {
+    for (const f of ev.target.files) { try { fotosPendientes.push(await fotoADataUrl(f)); } catch { toast('No pude leer esa imagen'); } }
+    ev.target.value = ''; pintarAdjuntos();
+  };
+
+  const enviar = async (texto) => {
+    if (!texto.trim() && !fotosPendientes.length) return;
+    const fotos = fotosPendientes; fotosPendientes = []; pintarAdjuntos();
+    input.value = '';
+    const vacio = chat.querySelector('.wa-vacio'); if (vacio) vacio.remove();
+    chat.insertAdjacentHTML('beforeend', `<div class="wa-msg yo">${fotos.map(f => `<img src="${f}">`).join('')}${texto ? `<div class="wa-txt">${esc(texto)}</div>` : ''}<div class="wa-hora">${horaCorta(new Date())}</div></div>
+      <div class="wa-msg bot escribiendo" id="wa-escribiendo"><div class="wa-txt">escribiendo…</div></div>`);
+    chat.scrollTop = chat.scrollHeight;
+    try {
+      await api('/api/intake/simulador', { method: 'POST', body: { texto, fotos } });
+    } catch (e) { toast('Error: ' + e.message); }
+    const msgs = await api('/api/intake/conversacion?tel=sim:leandro');
+    chat.innerHTML = burbujas(msgs);
+    chat.scrollTop = chat.scrollHeight;
+    actualizarBadges();
+  };
+
+  form.onsubmit = (ev) => { ev.preventDefault(); enviar(input.value); };
+  input.onkeydown = (ev) => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); enviar(input.value); } };
+  document.querySelectorAll('.ejemplo-carga').forEach(b => b.onclick = () => enviar(EJEMPLOS_CARGA[+b.dataset.i][1]));
+  document.getElementById('wa-reiniciar').onclick = async () => {
+    await api('/api/intake/reiniciar', { method: 'POST', body: {} });
+    rutas.carga();
+  };
+};
 
 /* ==================== ALTA RÁPIDA DE BÚSQUEDA ==================== */
 const TIPOS = ['lancha open', 'lancha cuddy', 'crucero', 'semirrigido/tracker', 'moto de agua', 'de coleccion'];
@@ -813,6 +1023,8 @@ rutas['alta-busqueda'] = async (_, prefill) => {
     form.entrega_algo.checked = !!d.entrega_algo;
     if (d.limitacion_declarada) form.limitacion_declarada.value = d.limitacion_declarada;
     if (d.contexto_personal) form.contexto_personal.value = d.contexto_personal;
+    form.dataset.modeloReferencia = d.modelo_referencia || '';
+    form.dataset.marcas = JSON.stringify(d.marcas_preferidas || []);
   };
 
   const mostrarExtraccion = (d) => {
@@ -822,6 +1034,7 @@ rutas['alta-busqueda'] = async (_, prefill) => {
         <dl>
           ${d.nombre ? `<dt>Nombre</dt><dd>${esc(d.nombre)}</dd>` : ''}
           ${(d.tipo_embarcacion || []).length ? `<dt>Tipo</dt><dd>${esc(d.tipo_embarcacion.join(', '))}</dd>` : ''}
+          ${d.modelo_referencia ? `<dt>Modelo que nombró</dt><dd>${esc(d.modelo_referencia)} — el matching le ofrece también la misma línea (más chicas y más grandes)</dd>` : ''}
           ${d.presupuesto_max ? `<dt>Presupuesto</dt><dd>${d.presupuesto_min ? usd(d.presupuesto_min) + ' – ' : 'hasta '}${usd(d.presupuesto_max)}</dd>` : ''}
           ${d.eslora_min || d.eslora_max ? `<dt>Eslora</dt><dd>${d.eslora_min || '?'} – ${d.eslora_max || '?'} m</dd>` : ''}
           ${(d.uso_declarado || []).length ? `<dt>Uso</dt><dd>${esc(d.uso_declarado.join(', '))}</dd>` : ''}
@@ -867,8 +1080,11 @@ rutas['alta-busqueda'] = async (_, prefill) => {
       limitacion_declarada: f.limitacion_declarada.value || null,
       contexto_personal: f.contexto_personal.value || null,
       texto_original: form.dataset.textoOriginal || null,
+      modelo_referencia: form.dataset.modeloReferencia || null,
+      marcas_preferidas: form.dataset.marcas ? JSON.parse(form.dataset.marcas) : [],
     };
     const r = await api('/api/busquedas', { method: 'POST', body });
+    if (r.propuestas && r.propuestas.length) setTimeout(() => toast(`🎯 Ya hay ${r.propuestas.length} embarcación${r.propuestas.length > 1 ? 'es' : ''} en stock que le sirve${r.propuestas.length > 1 ? 'n' : ''}: quedaron para aprobar en Hoy.`), 4300);
     toast(`Búsqueda guardada para ${r.persona_nombre}${r.persona_creada ? ' (persona nueva)' : ' (ya estaba en la base — deduplicada por teléfono)'}.`);
     location.hash = '#/persona/' + r.persona_id;
   };
@@ -985,8 +1201,8 @@ document.getElementById('btn-simular').onclick = async (ev) => {
   btn.disabled = false; btn.textContent = 'Simular mensaje entrante';
 };
 
-// Contadores del menú: se cargan al arrancar, no solo al entrar a cada sección
-(async () => {
+// Contadores del menú: se cargan al arrancar y después de cada acción que los mueve
+async function actualizarBadges() {
   try {
     const [hoy, busquedas, radar] = await Promise.all([api('/api/hoy'), api('/api/busquedas'), api('/api/radar')]);
     const set = (id, n) => { const b = document.getElementById(id); if (b) { b.hidden = !n; b.textContent = n; } };
@@ -994,6 +1210,7 @@ document.getElementById('btn-simular').onclick = async (ev) => {
     set('badge-busq', busquedas.filter(b => b.tiene_nueva_sin_ofrecer).length);
     set('badge-radar', radar.filter(a => a.bajas > 0 && !a.contactado).length);
   } catch {}
-})();
+}
+actualizarBadges();
 
 navegar();
