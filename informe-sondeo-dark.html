@@ -1,0 +1,195 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Sondeo de atención de brokers náuticos — informe para Leandro Ramos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0D12;--surface:#151A23;--surface-2:#1C222D;--border:#242C38;--border-2:#354050;--text:#ECEFF4;--text-2:#98A2B2;--text-3:#626C7C;--cy:#38CBDB;--cy-2:#5FDAE7;--cy-ink:#04171B;--cy-soft:rgba(56,203,219,.13);--ok:#45C788;--ok-soft:rgba(69,199,136,.14);--warn:#F2A24E;--violet:#A38BF0;--violet-soft:rgba(163,139,240,.15);--sans:"Hanken Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+*{box-sizing:border-box}
+@page{size:A4;margin:0}
+html{color-scheme:dark;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;font-size:12.5px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.lnk{color:var(--cy-2);font-size:.92em}
+.cover{position:relative;height:296mm;display:flex;flex-direction:column;background:var(--bg);background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:28px 28px;page-break-after:always;overflow:hidden}
+.cover::before{content:'';position:absolute;right:-180px;top:-180px;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(56,203,219,.22),rgba(56,203,219,0) 62%)}
+.cover>*{position:relative;z-index:2}
+.cover-top{display:flex;align-items:center;justify-content:space-between;padding:34px 46px}
+.brand{font-weight:800;font-size:17px;letter-spacing:.09em}.brand b{color:var(--cy)}
+.cover-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-2)}
+.cover-main{margin-top:auto;padding:0 46px 54px}
+.cover-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cy);margin-bottom:14px}
+.cover h1{margin:0 0 16px;font-size:44px;line-height:1.06;letter-spacing:-.02em;max-width:16ch}
+.cover p{margin:0;color:var(--text-2);font-size:16px;max-width:54ch}
+.cover .legend{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.cover .legend .pill{font-size:11px}
+.cover .legend span.x{color:var(--text-2);font-size:12.5px;align-self:center;margin-right:6px}
+.cover-foot{padding:0 46px 34px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3)}
+section{padding:30px 46px 26px;border-top:1px solid var(--border);break-before:page}
+section:first-of-type{border-top:0;break-before:auto}
+.s-head{break-inside:avoid;break-after:avoid}
+h2::first-letter{text-transform:uppercase}
+section>p:first-of-type{break-after:avoid}
+.s-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:14px}
+.s-eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--cy);margin-bottom:6px}
+h2{margin:0;font-size:22px;letter-spacing:-.015em;line-height:1.15}
+.price{font-size:20px;font-weight:600;color:var(--cy);white-space:nowrap;background:var(--cy-soft);border:1px solid rgba(56,203,219,.35);border-radius:999px;padding:6px 14px}
+p{margin:0 0 12px;color:var(--text-2);max-width:72ch}
+p b{color:var(--text)}
+p.note{font-size:12px}
+ul{margin:0 0 12px;padding-left:18px;color:var(--text-2)}li{margin-bottom:5px}li b{color:var(--text)}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin:4px 0 14px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px 12px}
+.stat .v{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--cy);letter-spacing:-.02em;line-height:1}
+.stat .t{font-size:11px;color:var(--text-2);margin-top:7px;line-height:1.35}
+table.tbl{width:100%;border-collapse:separate;border-spacing:0;margin:6px 0 14px;background:var(--surface);border:1px solid var(--border);border-radius:13px;overflow:hidden;font-size:12px;page-break-inside:auto}
+table.tbl tr{page-break-inside:avoid}
+table.tbl th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);text-align:left;padding:10px 12px;background:var(--surface-2);border-bottom:1px solid var(--border-2)}
+table.tbl td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text-2);line-height:1.45}
+table.tbl tr:last-child td{border-bottom:0}
+table.tbl td.first{color:var(--text);font-weight:700}
+table.tbl-feat td.first{width:24%}
+table.tbl-feat td.st{width:23%}
+table.tbl-check td.first{width:34px;font-family:var(--mono);color:var(--cy)}
+table.tbl-check td{padding:6px 12px;font-size:11.5px;line-height:1.38}
+table.tbl-check th{padding:8px 12px}
+.foot{break-before:avoid}
+.pill{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;border-radius:999px;padding:3px 9px;border:1px solid;line-height:1.3}
+.pill.ok{color:var(--ok);background:var(--ok-soft);border-color:rgba(69,199,136,.4)}
+.pill.cy{color:var(--cy);background:var(--cy-soft);border-color:rgba(56,203,219,.4)}
+.pill.vi{color:var(--violet);background:var(--violet-soft);border-color:rgba(163,139,240,.4)}
+.claim-line{color:var(--text);font-weight:600;font-size:13px;border-left:3px solid var(--cy);padding:6px 12px;background:var(--cy-soft);border-radius:0 10px 10px 0;max-width:none;margin:0 0 14px}
+.rest{display:block;margin-top:5px;font-size:11px;color:var(--text-3)}
+.foot{padding:22px 46px 30px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3)}
+
+.chart{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:14px 10px 6px;margin:4px 0 8px;break-inside:avoid}
+.cap{font-family:var(--mono);font-size:10.5px;color:var(--text-3);margin:0 0 14px}
+blockquote{margin:0 0 14px;padding:10px 16px;border-left:3px solid var(--cy);background:var(--cy-soft);border-radius:0 10px 10px 0;color:var(--text);font-size:12.5px;max-width:72ch}
+table.tbl-num td.first{width:30%}
+table.tbl td b{color:var(--cy)}
+.stat .v{font-size:19px}
+table.tbl-ev td{padding:4px 10px;font-size:10.7px;line-height:1.32}
+table.tbl-ev th{padding:7px 10px}
+table.tbl-ev td.first{width:12%}
+.foot{break-before:avoid}
+</style></head><body>
+<div class="cover"><div class="cover-top"><div class="brand">CRM <b>NÁUTICO</b></div><div class="cover-tag">Leandro Ramos · Broker Náutico</div></div>
+<div class="cover-main"><div class="cover-eyebrow">Sondeo de atención · 14 al 16 de octubre de 2026</div><h1>Cómo atienden los brokers náuticos cuando alguien les escribe.</h1><p>13 competidores consultados como comprador por WhatsApp e Instagram. Quién respondió, en cuánto tiempo, qué dijo y quién volvió a escribir solo. Todo sacado de los chats, con hora.</p>
+<div class="legend"><span class="x">Canales:</span><span class="pill cy">WhatsApp</span><span class="x">Quicksilver 1800, 14/10</span><span class="pill vi" style="color:var(--text-2);border-color:var(--border-2);background:var(--surface-2)">Instagram</span><span class="x">Canestrari 215, 15/10</span></div></div>
+<div class="cover-foot"><span>Oct 15, 2026 · Lucho</span><span>cierre de lectura 16/10 10:25</span></div></div>
+<section><div class="s-head"><div><div class="s-eyebrow">Resumen</div><h2>Lo que pasó</h2></div></div><p style="color:var(--text);font-size:14px;max-width:70ch">13 brokers de zona norte consultados como comprador por WhatsApp (14/10) y por Instagram (15/10). Por WhatsApp respondieron los 13, la mitad en menos de 14 minutos y el último a las 29 horas; por Instagram, 9 de 12: 7 el mismo día y 2 a la mañana siguiente. Volvieron a escribir solos 2 por cada canal, y uno (Royal Yachts) avisó cuando le entró una unidad que coincidía. Todo lo que sigue sale de los chats, con hora; cierre de lectura: 16/10 a las 10:25.</p></section>
+<section style="break-before:auto;border-top:1px solid var(--border)"><div class="s-head"><div><div class="s-eyebrow">Sección 01</div><h2>En números</h2></div></div>
+<div class="stats"><div class="stat"><div class="v">13</div><div class="t">brokers consultados</div></div><div class="stat"><div class="v">13/13</div><div class="t">respondieron por WhatsApp</div></div><div class="stat"><div class="v">13,5 min</div><div class="t">mediana WhatsApp</div></div><div class="stat"><div class="v">9/12</div><div class="t">respondieron por Instagram</div></div><div class="stat"><div class="v">3 h 3 min</div><div class="t">mediana Instagram</div></div><div class="stat"><div class="v">2+2</div><div class="t">volvieron solos, por canal</div></div></div>
+<table class="tbl tbl-num"><thead><tr><th></th><th>WhatsApp (14/10)</th><th>Instagram (15/10, al cierre 16/10 10:25)</th></tr></thead><tbody>
+<tr><td class="first">Consultas enviadas</td><td>13</td><td>12 en la ronda medida; Diego Marcon, enviado a las 21:37, respondió a las 8 h</td></tr>
+<tr><td class="first">Respondieron</td><td>13 (Royal Yachts a las 29 h)</td><td>9 de 12 (3 en la primera hora, 7 el mismo día, 2 a la mañana siguiente); Diego Marcon también</td></tr>
+<tr><td class="first">Respondieron en menos de 30 min</td><td>8</td><td>2 (una automática)</td></tr>
+<tr><td class="first">Mediana de demora de los que respondieron</td><td>13,5 min</td><td>3 h 3 min (de los 9 que respondieron)</td></tr>
+<tr><td class="first">Más de 2 horas o sin respuesta</td><td>4 (Royal Yachts respondió a las 29 h)</td><td>3 tardaron más de 2 h; 2 respondieron a la mañana siguiente; 3 sin respuesta al cierre</td></tr>
+<tr><td class="first">Personas confirmadas</td><td>10 de 13 (Royal Yachts: "No tenemos asistente virtuales, solo atención personalizada")</td><td>2 se presentaron con nombre (Joaquín de Nave Náutica, Hernán Cataldo)</td></tr>
+<tr><td class="first">Respuestas automáticas</td><td>1 (Mooney)</td><td>1 (Anglada)</td></tr>
+<tr><td class="first">Ofrecieron una unidad concreta (modelo y precio)</td><td>3 (Gallino, Mooney, Nave Náutica)</td><td>3 (Nave Náutica: una 2007 con fotos, sin precio; Royal Yachts: 245 2020 a USD 60.000 y 215 2011 a USD 27.000; Mooney: Canestrari 245 con link)</td></tr>
+<tr><td class="first">Volvieron a escribir solos en 24 h</td><td>2 de 13</td><td>2 de 12 (DeNauticos "Pudiste ver?" 19:42; Royal Yachts avisó una 215 que entró, 18:07)</td></tr>
+</tbody></table>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Sección 02</div><h2>Tiempos de respuesta</h2></div></div>
+<div class="chart"><svg viewBox="0 0 760 564" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Hanken Grotesk, sans-serif" font-size="12"><text x="20" y="26" font-size="16" font-weight="700" fill="#ECEFF4">Demora hasta la primera respuesta, por canal</text><text x="20" y="46" fill="#98A2B2">WhatsApp: 8 de 13 en menos de 30 min · Instagram: 7 de 12 respondieron el mismo día y 2 a la mañana siguiente</text><rect x="560" y="18" width="10" height="10" rx="2" fill="#38CBDB"/><text x="574" y="27" fill="#98A2B2">WhatsApp</text><rect x="655" y="18" width="10" height="10" rx="2" fill="#98A2B2"/><text x="669" y="27" fill="#98A2B2">Instagram</text><line x1="169.4736842105263" x2="169.4736842105263" y1="68" y2="540" stroke="#354050" stroke-dasharray="4 3"/><text x="173.4736842105263" y="64" fill="#626C7C">30 min</text><text x="122" y="88" text-anchor="end" fill="#ECEFF4">Diego Marcon</text><rect x="130" y="74" width="2.0" height="12" rx="2" fill="#38CBDB"/><text x="175.5" y="84" fill="#ECEFF4" font-size="11">1 min</text><text x="175.4736842105263" y="99" fill="#626C7C" font-size="11">Instagram: enviado 21:37, respondió a las 8 h</text><text x="122" y="124" text-anchor="end" fill="#ECEFF4">DeNauticos</text><rect x="130" y="110" width="2.0" height="12" rx="2" fill="#38CBDB"/><text x="175.5" y="120" fill="#ECEFF4" font-size="11">1 min</text><rect x="130" y="125" width="126.3" height="12" rx="2" fill="#98A2B2"/><text x="262.3" y="135" fill="#ECEFF4" font-size="11">1 h 36 min</text><text x="122" y="160" text-anchor="end" fill="#ECEFF4">Naztica</text><rect x="130" y="146" width="2.0" height="12" rx="2" fill="#38CBDB"/><text x="175.5" y="156" fill="#ECEFF4" font-size="11">1 min</text><text x="175.4736842105263" y="171" fill="#626C7C" font-size="11">Instagram: sin respuesta (cierre 16/10 10:15)</text><text x="122" y="196" text-anchor="end" fill="#ECEFF4">Carballal</text><rect x="130" y="182" width="5.3" height="12" rx="2" fill="#38CBDB"/><text x="175.5" y="192" fill="#ECEFF4" font-size="11">4 min</text><rect x="130" y="197" width="240.8" height="12" rx="2" fill="#98A2B2"/><text x="376.8" y="207" fill="#ECEFF4" font-size="11">3 h 3 min</text><text x="122" y="232" text-anchor="end" fill="#ECEFF4">CR Barcos</text><rect x="130" y="218" width="10.5" height="12" rx="2" fill="#38CBDB"/><text x="175.5" y="228" fill="#ECEFF4" font-size="11">8 min</text><rect x="130" y="233" width="480.3" height="12" rx="2" fill="#98A2B2"/><text x="616.3" y="243" fill="#ECEFF4" font-size="11">6 h 5 min</text><text x="122" y="268" text-anchor="end" fill="#ECEFF4">Anglada</text><rect x="130" y="254" width="15.8" height="12" rx="2" fill="#38CBDB"/><text x="175.5" y="264" fill="#ECEFF4" font-size="11">12 min</text><rect x="130" y="269" width="2.0" height="12" rx="2" fill="#98A2B2"/><text x="175.5" y="279" fill="#ECEFF4" font-size="11">0 min, automático</text><text x="122" y="304" text-anchor="end" fill="#ECEFF4">Gallino</text><rect x="130" y="290" width="19.7" height="12" rx="2" fill="#38CBDB"/><text x="175.5" y="300" fill="#ECEFF4" font-size="11">15 min</text><text x="175.4736842105263" y="315" fill="#626C7C" font-size="11">Instagram: sin respuesta (cierre 16/10 10:15)</text><text x="122" y="340" text-anchor="end" fill="#ECEFF4">Puranautica</text><rect x="130" y="326" width="35.5" height="12" rx="2" fill="#38CBDB"/><text x="175.5" y="336" fill="#ECEFF4" font-size="11">27 min</text><rect x="130" y="341" width="340.8" height="12" rx="2" fill="#98A2B2"/><text x="476.8" y="351" fill="#ECEFF4" font-size="11">4 h 19 min</text><text x="122" y="376" text-anchor="end" fill="#ECEFF4">Canedo</text><rect x="130" y="362" width="43.4" height="12" rx="2" fill="#38CBDB"/><text x="179.4" y="372" fill="#ECEFF4" font-size="11">33 min</text><text x="175.4736842105263" y="387" fill="#626C7C" font-size="11">Instagram: sin respuesta (cierre 16/10 10:15)</text><text x="122" y="412" text-anchor="end" fill="#ECEFF4">Mooney</text><rect x="130" y="398" width="214.5" height="12" rx="2" fill="#38CBDB"/><text x="350.5" y="408" fill="#ECEFF4" font-size="11">2 h 43 min</text><text x="175.4736842105263" y="423" fill="#626C7C" font-size="11">Instagram: respondió a las 17 h</text><text x="122" y="448" text-anchor="end" fill="#ECEFF4">Nave Náutica</text><rect x="130" y="434" width="217.1" height="12" rx="2" fill="#38CBDB"/><text x="353.1" y="444" fill="#ECEFF4" font-size="11">2 h 45 min</text><rect x="130" y="449" width="14.5" height="12" rx="2" fill="#98A2B2"/><text x="175.5" y="459" fill="#ECEFF4" font-size="11">11 min</text><text x="122" y="484" text-anchor="end" fill="#ECEFF4">Zanovello</text><rect x="130" y="470" width="311.8" height="12" rx="2" fill="#38CBDB"/><text x="447.8" y="480" fill="#ECEFF4" font-size="11">3 h 57 min</text><text x="175.4736842105263" y="495" fill="#626C7C" font-size="11">Instagram: respondió a las 15 h</text><text x="122" y="520" text-anchor="end" fill="#ECEFF4">Royal Yachts</text><text x="175.4736842105263" y="516" fill="#626C7C" font-size="11">WhatsApp: respondió a las 29 h</text><rect x="130" y="521" width="40.8" height="12" rx="2" fill="#98A2B2"/><text x="176.8" y="531" fill="#ECEFF4" font-size="11">31 min</text></svg></div>
+<p class="cap">tomado de los chats de WhatsApp (14/10) e Instagram (15/10) de Luciano, cierre de lectura 10:25 del 16/10; demora desde el envío hasta el primer mensaje del broker</p>
+<p>Por WhatsApp la mitad respondió en menos de 14 minutos, 3 tardaron más de 2 horas y Royal Yachts contestó a las 29 horas. Por Instagram respondieron 9 de 12: 3 en la primera hora, 4 más el mismo día (entre 1 h 36 min y 6 h 5 min) y 2 a la mañana siguiente (Zanovello a las 15 h, Mooney a las 17 h).</p>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Sección 03</div><h2>Conclusiones por broker</h2></div></div>
+<table class="tbl"><thead><tr><th>Broker</th><th>WhatsApp (Quicksilver 1800)</th><th>Instagram (Canestrari 215)</th><th>En una línea</th></tr></thead><tbody>
+<tr><td class="first"><b>Diego Marcon</b></td><td>1 min, audio; persona</td><td>enviado 21:37; respondió a las 8 h (05:39): no trabaja barcos de más de 6 años, aconseja comprar lo más nuevo posible, pide presupuesto</td><td>Rápido por WhatsApp; en Instagram filtra por antigüedad y pide presupuesto.</td></tr>
+<tr><td class="first"><b>Gallino Marine</b></td><td>15 min, audio + Quicksilver 1800 2016 a USD 14.900 con link; persona</td><td>sin respuesta</td><td>El único que mandó una unidad con precio y ficha.</td></tr>
+<tr><td class="first"><b>DeNauticos</b></td><td>1 min, "Soy Marcelo", texto pre-armado, pide presupuesto; volvió a escribir 3 veces</td><td>1 h 36 min; manda al listado de su web y pide un WhatsApp para las fichas; 19:42 vuelve solo: "Pudiste ver?"</td><td>El más insistente; respuestas enlatadas.</td></tr>
+<tr><td class="first"><b>Zanovello</b></td><td>3 h 57 min, "no tengo nada parecido"; no dijo si es persona</td><td>15 h (06:27 del 16/10): "Buen día. Nada por el momento"</td><td>Lento y sin alternativa en los dos canales.</td></tr>
+<tr><td class="first"><b>Mooney</b></td><td>saludo automático a 0 min; a las 2 h 43 min persona con Klase A 1800 2021 a USD 17.000</td><td>17 h (08:34 del 16/10): no tiene 215, ofrece una Canestrari 245 con link a su web</td><td>Bot de saludo, después oferta concreta; en Instagram tardó un día pero también ofreció.</td></tr>
+<tr><td class="first"><b>Anglada</b></td><td>12 min, dos audios; persona</td><td>automático a 0 min, después nada</td><td>Rápido por WhatsApp; en Instagram solo el bot.</td></tr>
+<tr><td class="first"><b>Puranautica</b></td><td>27 min, "Soy Hernán Cataldo.. nada de virtual"; deriva lanchas a un colega</td><td>4 h 19 min; de nuevo deriva a Naza de Renauticos</td><td>Persona; no vende lanchas, deriva.</td></tr>
+<tr><td class="first"><b>Carballal</b></td><td>4 min, "Con una persona" (Gustavo); pide presupuesto, open o cuddy, motor</td><td>3 h 3 min; pide el WhatsApp para seguir por ahí</td><td>Rápido, califica al cliente, no ofrece nada.</td></tr>
+<tr><td class="first"><b>Nave Náutica</b></td><td>2 h 45 min, "Sebastian… persona real"; ofrece Bermuda Sport 2021 o Sport 180</td><td>11 min, "Joaquín"; a los 54 min ofrece una 2005 Volvo Penta sin precio; a las 17:51 manda 4 fotos de una 2007 con 330 horas</td><td>Dos personas distintas según el canal; rápido en Instagram, lento en WhatsApp.</td></tr>
+<tr><td class="first"><b>CR Barcos</b></td><td>8 min, Christian Riccitelli; precio de referencia USD 16.000 a 17.000; no dijo si es persona; aviso de IA de Meta en el chat</td><td>6 h 5 min; audio de 0:16 (sin escuchar)</td><td>Rápido, informa precio, no ofrece unidad.</td></tr>
+<tr><td class="first"><b>Canedo</b></td><td>33 min, "con una persona, no uso asistente" (Lucas); volvió a pedir llamar</td><td>sin respuesta</td><td>Persona, quiere hablar por teléfono, no ofrece nada.</td></tr>
+<tr><td class="first"><b>Naztica</b></td><td>1 min, dos audios; persona</td><td>sin respuesta</td><td>Rápido, atiende por audio.</td></tr>
+<tr><td class="first"><b>Royal Yachts</b></td><td>29 h: "No tenemos asistente virtuales, solo atención personalizada"</td><td>31 min, audio + pide presupuesto; 16:23 ofrece una 245 2020 a USD 60.000; 18:07 avisa solo: "Entró una 215: 2011 u$s 27.000.- +4%"</td><td>Lento por WhatsApp, atento por Instagram: el único que avisó solo cuando le entró una unidad.</td></tr>
+</tbody></table>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Sección 04</div><h2>Qué cambia un agente que responde rápido y bien</h2></div></div>
+<p>Lo que se vio es la oportunidad; lo que haría el agente es la propuesta, no un resultado del sondeo.</p>
+<table class="tbl"><thead><tr><th>Lo que se vio</th><th>Lo que hace el agente</th></tr></thead><tbody>
+<tr><td class="first">5 de 13 tardaron más de 30 min por WhatsApp (Royal Yachts, 29 horas); por Instagram 9 de 12 no respondieron en la primera hora, 5 seguían sin responder seis horas después y 3 no respondieron en 19 horas.</td><td>Responde en segundos, en los dos canales, a cualquier hora.</td></tr>
+<tr><td class="first">Los dos automáticos (Mooney, Anglada) no dijeron nada útil: "haznos saber cómo podemos ayudarte", "pronto te vamos a estar respondiendo".</td><td>Responde con contenido: stock real, precio, alternativa parecida.</td></tr>
+<tr><td class="first">4 pidieron presupuesto o criterios antes de ofrecer; 2 sólo preguntaron, sin ofrecer nada.</td><td>Califica en la misma conversación (presupuesto, uso, antigüedad) y guarda la búsqueda.</td></tr>
+<tr><td class="first">Volvieron a escribir solos 2 de 13 por WhatsApp y 2 de 12 por Instagram; solo uno (Royal Yachts) avisó cuando le entró una unidad que coincidía.</td><td>Hace seguimiento solo y avisa cuando entra una unidad que coincide (motor de coincidencias del CRM).</td></tr>
+<tr><td class="first">Nave Náutica atendió con dos personas distintas según el canal; Royal Yachts respondió en uno y no en el otro.</td><td>Una sola conversación por cliente, con historial, sin importar por dónde escribió.</td></tr>
+</tbody></table>
+<p>En la primera hora, el comprador no tuvo respuesta humana de 4 de 13 brokers por WhatsApp y de 10 de 12 por Instagram (9 sin nada, 1 con solo un automático). Esa ventana es la que un agente cubre.</p>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Sección 05</div><h2>Evidencia WhatsApp: qué escribió cada uno</h2></div></div>
+<p>Horas del 14/10/2026; demora desde nuestro envío hasta su primer mensaje. Citas textuales. Dato que se repitió sin que lo pidiéramos: DeNauticos y CR Barcos dijeron, cada uno por su lado, que Quicksilver dejó de fabricar hacia 2016 o 2017 por un incendio del astillero, y Gallino ofreció una 2016. No se verificó con otra fuente.</p>
+<table class="tbl tbl-ev"><thead><tr><th>Broker</th><th>Enviado</th><th>1ª respuesta</th><th>Demora</th><th>Qué escribieron</th></tr></thead><tbody>
+<tr><td class="first">Mooney</td><td>15:17</td><td>15:17 (automático) / 18:00 (persona)</td><td>0 min / 2 h 43 min</td><td>15:17: "Gracias por comunicarte con Mooney Embarcaciones. Por favor, haznos saber cómo podemos ayudarte." 18:00: "Hola! No tengo Quicksilver 1800 en este momento. Estoy tomando una Klase A 1800 2021 con Evinrude 115 HP en USD 17.000.- Mañana voy a tener fotos para enviarte."</td></tr>
+<tr><td class="first">Diego Marcon</td><td>15:16</td><td>15:17</td><td>1 min</td><td>Audio de 0:31 (escuchado por Luciano).</td></tr>
+<tr><td class="first">DeNauticos</td><td>15:17</td><td>15:18</td><td>1 min</td><td>"Quicksilver se incendio en el 2016 maso" / "Dejo de fabricar" / "En ese año". 15:19, citando la pregunta directa: "Soy Marcelo". "Te pego respuestas ya elaboradas como la siguiente" y un texto armado con el buscador de su web, su Instagram, "¡Más de 300 embarcaciones publicadas!" y "SIN COMISIÓN PARA EL COMPRADOR". 15:22: "Es importante conocer el presupuesto".</td></tr>
+<tr><td class="first">Naztica</td><td>15:20</td><td>15:21</td><td>1 min</td><td>Dos audios (0:15 y 0:27), escuchados por Luciano.</td></tr>
+<tr><td class="first">Carballal</td><td>15:18</td><td>15:22</td><td>4 min</td><td>"Hola Luciano, buenas tardes como estas? Mi nombre es Gustavo Carballal." 15:23: "Con una persona" / "Orientame, buscas open o Cuddy, presupuesto?" 15:24: "Buscas con motor fuera de borda, motor interno?"</td></tr>
+<tr><td class="first">CR Barcos</td><td>15:19</td><td>15:27</td><td>8 min</td><td>"Luciano buenas tardes, mi nombre es Christian Riccitelli, te cuento que las Quicksilver en general se dejaron de fabricar si mal no recuerdo en el 2017, ya que el astillero se prendió fuego y dejaron de fabricar, los valores de las mas nuevas que habría rondan los 16 o 17 mil dolares". El chat muestra el aviso de WhatsApp de que esa cuenta usa la IA de Meta para generar mensajes.</td></tr>
+<tr><td class="first">Anglada</td><td>15:18</td><td>15:30</td><td>12 min</td><td>Dos audios (0:42 y 0:09), escuchados por Luciano.</td></tr>
+<tr><td class="first">Gallino</td><td>15:16</td><td>15:31</td><td>15 min</td><td>Audio de 0:27 (escuchado por Luciano). 15:32: link a su posteo de Instagram: "QUICKSILVER 1800 OPEN … EVINRUDE 135 HP HO E-TEC … HORAS: 565 AÑO: 2016 … Precio 14900 dólares billetes Comisión por gestión de venta 5%".</td></tr>
+<tr><td class="first">Puranautica</td><td>15:18</td><td>15:45</td><td>27 min</td><td>"Hola Luciano mucho gusto". 15:46: "Soy Hernán Cataldo.. jajaja nada de virtual por aca". 15:47: "Te cuento, lanchas y Daycruiser las manejo con un colega y amigo .. si me permitís le paso tu contacto para que te guíe y ofrezca lo que tiene en stock !" / "Se llama Naza de Re Nauticos".</td></tr>
+<tr><td class="first">Canedo</td><td>15:20</td><td>15:53</td><td>33 min</td><td>"Buen día , Soy Lucas Fernández Canedo de Canedo Barcos. Cómo estás ? Un Gusto." 15:54, citando mi mensaje: "con una persona, no uso asistente automatico. Como estas? Un gusto". 18:09: "Luciano. Decime si te puedo llamar".</td></tr>
+<tr><td class="first">Nave Náutica</td><td>15:19</td><td>18:04</td><td>2 h 45 min</td><td>"Buenas tardes Luciano" / "Todo bien". 18:07: "Sebastian por aca, persona real". 18:08: "Por el momento no tenemos ninguna Quiksilver 1800". 18:09: "Te puedo ofrecer un Bermuda sport 2021 usada con un mercury 150" / "O recomendación un equipo nuevo del astillero bermuda". 18:10: "Podría ser una sport 180" / "las conoces?" / "Depende un poco el presupuesto con el que contas".</td></tr>
+<tr><td class="first">Zanovello</td><td>15:17</td><td>19:14</td><td>3 h 57 min</td><td>"Hola. No tengo nada parecido, perdón. Igualmente las lanchas no son mi fuerte soy más de barcos a motor".</td></tr>
+<tr><td class="first">Royal Yachts</td><td>15:20</td><td>20:31 del 15/10</td><td>29 h 11 min</td><td>"Le agradezco su mensaje e interés en nosotros. No tenemos asistente virtuales, solo atención personalizada". No habló de la Quicksilver ni ofreció nada.</td></tr>
+</tbody></table>
+
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Sección 06</div><h2>Evidencia Instagram: qué escribió cada uno</h2></div></div>
+<p>Enviados el 15/10 entre 15:19 y 15:25; cierre de lectura 10:25 del 16/10. Las citas son textuales.</p>
+<table class="tbl tbl-ev"><thead><tr><th>Broker</th><th>Enviado</th><th>1ª respuesta</th><th>Demora</th><th>Qué escribieron</th></tr></thead><tbody>
+<tr><td class="first"><b>Anglada</b></td><td>15:24</td><td>15:24 (automático)</td><td>0 min</td><td>"Gracias por escribirnos, pronto te vamos a estar respondiendo. Te invitamos a que ingreses en nuestro sitio web y sigas viendo las embarcaciones que tenemos para vos" + link. Nada más.</td></tr>
+<tr><td class="first"><b>Nave Náutica</b></td><td>15:25</td><td>15:36</td><td>11 min</td><td>"Hola Luciano buenas tardes! Cómo estás? Joaquín. Por acá" / "Buscas con algún motor en particular?" / "Tengo una que está bástate buena en guardería Albardon". Le pedimos motor, horas, año, valor y visita (15:38). 15:44: "Déjame que te averiguo todo". 16:19: "2005 único dueño Volvo penta aprox 500 horas" / "Si te interesa podemos ir a verla tendría que cordinar un poco todo". Le dijimos que 2005 le queda vieja y pedimos valor (16:30). 17:13: "Mira ahí te paso fotos" / "Está muy buena". 17:51: 4 fotos + "Es 2007 tiene 330 horas" / "Está muy muy buena se usa muy poco". Sin precio.</td></tr>
+<tr><td class="first"><b>Royal Yachts</b></td><td>15:24</td><td>15:55</td><td>31 min</td><td>Audio de 0:25 (sin escuchar) + "Que presupuesto manejas para saber el año aprox?". Le respondimos que busca de menos de 10 años y pedimos valores (16:08). 16:23: "Hay una 245 - 2020 excelente estado por usd 60k" / "215 como te comenté nada por ahora". 18:07, sin que escribiéramos nada: "Entró una 215: 2011 u$s 27.000.- +4% con Mercruiser 260 V8" / "Está muy buena."</td></tr>
+<tr><td class="first"><b>Gallino</b></td><td>15:19</td><td>sin respuesta</td><td>—</td><td></td></tr>
+<tr><td class="first"><b>DeNauticos</b></td><td>15:20</td><td>16:56</td><td>1 h 36 min</td><td>"Hola" / "Si claro las publicadas en esta cuenta" / "Te paso un link a nuestra web donde ves el listado" + link y tarjeta de denauticos.ar / "Si clickeas ahi.. ves el listado" / "Si me pasas un wp te pasamos las fichas x ese medio". 19:42, sin respuesta nuestra: "Pudiste ver?"</td></tr>
+<tr><td class="first"><b>Mooney</b></td><td>15:20</td><td>08:34 del 16/10</td><td>17 h 14 min</td><td>"Buenos días, no tengo a canestrari 215, puedo ofrecerte una 245" + link a la ficha en mooneyembarcaciones.com.ar.</td></tr>
+<tr><td class="first"><b>Zanovello</b></td><td>15:20</td><td>06:27 del 16/10</td><td>15 h 7 min</td><td>"Buen día. Nada por el momento"</td></tr>
+<tr><td class="first"><b>Puranautica</b></td><td>15:24</td><td>19:43</td><td>4 h 19 min</td><td>"Hola Luciano buenas tardes ! Perdona el retraso en la respuesta ! Mira yo tengo en stock pero si te puedo recomendar a un gran colega .. Naza de Renauticos el suele tener ese tipo de embarcaciones. Si quieres le digo que te contacte .. Gracias por tu contacto!"</td></tr>
+<tr><td class="first"><b>Carballal</b></td><td>15:24</td><td>18:27</td><td>3 h 3 min</td><td>"Hola Luciano como estás? Me pasas tu WhatsApp así hablamos mejor?"</td></tr>
+<tr><td class="first"><b>CR Barcos</b></td><td>15:25</td><td>21:30</td><td>6 h 5 min</td><td>Audio de 0:16 (sin escuchar).</td></tr>
+<tr><td class="first"><b>Canedo</b></td><td>15:25</td><td>sin respuesta</td><td>—</td><td></td></tr>
+<tr><td class="first"><b>Naztica</b></td><td>15:25</td><td>sin respuesta</td><td>—</td><td></td></tr>
+<tr><td class="first"><b>Diego Marcon</b></td><td>21:37</td><td>05:39 del 16/10</td><td>8 h 2 min</td><td>"Hola Luciano, gracias por contactarte. No trabajo con embarcaciones con más de 6 años de antigüedad. Mi consejo, compra lo más nuevo que puedas aunque tengas que resignar eslora. Te ahorras dolores de cabez y cuando quieras vender es más fácil." / "Que presupuesto manejas?" Enviado a las 21:37 a pedido de Luciano; el hilo ya tenía conversaciones de 2020 y 2021, así que Diego sabe quién pregunta.</td></tr>
+</tbody></table>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Sección 07</div><h2>Lo que no se midió y límites</h2></div></div>
+<p>El sondeo mide la reacción al primer contacto en un día y un horario; no mide cómo trabajan una conversación ni cómo cierran una venta.</p>
+<ul>
+<li>Un solo mensaje por canal, un martes y un miércoles a las 15:20; nunca se siguió la conversación por WhatsApp.</li>
+<li>Ventana observada: 29 horas en WhatsApp y 19 horas en Instagram (cierre 10:25 del 16/10). Seguimiento a días o semanas: no medido.</li>
+<li>Audios de WhatsApp escuchados por Luciano (personas), no transcriptos; los de Royal Yachts y CR Barcos en Instagram, sin escuchar.</li>
+<li>Que Quicksilver dejó de fabricar hacia 2016 o 2017 lo dijeron dos brokers; no se verificó.</li>
+</ul>
+</section>
+<section style="break-before:auto"><div class="s-head"><div><div class="s-eyebrow">Sección 08</div><h2>Método y contactos</h2></div></div>
+<p>Misma lista de 13 brokers de zona norte (guía de brokers de renauticos.com y sus webs). En ninguna ronda se les respondió después del primer mensaje, salvo los dos follow-ups de Instagram indicados arriba.</p>
+<p><b>Ronda 1, WhatsApp, 14/10/2026, 15:16 a 15:20.</b> Enviado desde el WhatsApp de Luciano a los 13. Texto idéntico para todos:</p>
+<blockquote>Hola, ¿cómo va? Estoy buscando una Quicksilver 1800, año 2020 a 2024. ¿Tienen alguna disponible o les va a entrar alguna? ¿En qué precio andan? Si no tienen, ¿qué me recomendarían parecido para pasear en familia por el Delta? Una última: ¿estoy hablando con una persona o con un asistente automático?</blockquote>
+<p><b>Ronda 2, Instagram (mensaje directo), 15/10/2026, 15:19 a 15:25.</b> Enviado desde la cuenta personal de Luciano a 12 de los 13, sin la pregunta directa, para que no asocien las dos consultas. Diego Marcon recibió el mismo mensaje a las 21:37 del 15/10, después del cierre y a pedido de Luciano: ese hilo ya tenía una conversación previa con Luciano (octubre 2020 y marzo 2021). Texto idéntico para los 13:</p>
+<blockquote>Hola! Estoy buscando una Canestrari 215 en buen estado, no tengo problema con el año si está bien cuidada. ¿Tienen alguna o saben de alguna que esté por entrar? ¿En qué valores andan hoy?</blockquote>
+<table class="tbl tbl-check tbl-ev"><thead><tr><th>#</th><th>Broker</th><th>Zona</th><th>WhatsApp (fuente)</th><th>Instagram</th></tr></thead><tbody>
+<tr><td class="first">1</td><td>Diego Marcon Broker Náutico</td><td>—</td><td>+54 9 11 3331-4041 (diegomarcon.com.ar)</td><td>@diegomarconbrokernautic0 (enviado 21:37)</td></tr>
+<tr><td class="first">2</td><td>Gallino Marine, Daniel Gallino</td><td>Tigre</td><td>+54 9 11 4087-1418 (renauticos)</td><td>@gallinomarine</td></tr>
+<tr><td class="first">3</td><td>DeNauticos, Marcelo Crescini</td><td>Benavídez</td><td>+54 9 11 3178-2300 (denauticos.ar)</td><td>@denauticos.ar</td></tr>
+<tr><td class="first">4</td><td>Zanovello Barcos y Propiedades</td><td>San Fernando</td><td>+54 9 11 5247-1571 (zanovellobarcos.com.ar)</td><td>@zanovellobarcosypropiedades</td></tr>
+<tr><td class="first">5</td><td>Mooney Embarcaciones</td><td>San Fernando</td><td>+54 9 11 4935-0064 (mooneyembarcaciones.com.ar)</td><td>@mooneyembarcaciones</td></tr>
+<tr><td class="first">6</td><td>Anglada Embarcaciones</td><td>San Fernando</td><td>+54 9 11 2330-5650 (renauticos)</td><td>@angladaembarcaciones</td></tr>
+<tr><td class="first">7</td><td>Puranautica, Hernán Cataldo</td><td>Tigre</td><td>+54 9 11 6160-6240 (renauticos)</td><td>@puranautica</td></tr>
+<tr><td class="first">8</td><td>Carballal Embarcaciones</td><td>Tigre</td><td>+54 9 11 5185-3110 (renauticos)</td><td>@carballal.embarcaciones</td></tr>
+<tr><td class="first">9</td><td>Nave Náutica</td><td>Tigre</td><td>+54 9 11 5019-9321 (renauticos)</td><td>@nave.nautica</td></tr>
+<tr><td class="first">10</td><td>CR Barcos, Christian Riccitelli</td><td>Tigre</td><td>+54 9 11 4049-4212 (renauticos)</td><td>@crbarcos</td></tr>
+<tr><td class="first">11</td><td>Canedo Barcos</td><td>Vicente López</td><td>+54 9 11 6583-3100 (renauticos)</td><td>@canedobarcos</td></tr>
+<tr><td class="first">12</td><td>Naztica Embarcaciones</td><td>Núñez</td><td>+54 9 11 4703-5213 (renauticos)</td><td>@nazticaembarcaciones</td></tr>
+<tr><td class="first">13</td><td>Royal Yachts</td><td>San Fernando</td><td>+54 9 11 2826-1000 (renauticos)</td><td>@royalyachtsar</td></tr>
+</tbody></table>
+<p>Los chats de WhatsApp se leyeron cinco veces (14/10 a las 15:50, 16:24 y 22:57; 15/10 a las 15:30 y 21:42; 16/10 a las 10:25) y los de Instagram hasta la hora de cierre que figura en cada tabla.</p>
+</section>
+<div class="foot"><span>CRM Náutico · sondeo de brokers</span><span>Consultora Mati y Lucho · Oct 15, 2026</span></div>
+</body></html>

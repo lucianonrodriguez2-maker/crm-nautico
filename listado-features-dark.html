@@ -1,0 +1,244 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><title>CRM Náutico de Leandro Ramos — listado de features</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0D12;--surface:#151A23;--surface-2:#1C222D;--border:#242C38;--border-2:#354050;--text:#ECEFF4;--text-2:#98A2B2;--text-3:#626C7C;--cy:#38CBDB;--cy-2:#5FDAE7;--cy-ink:#04171B;--cy-soft:rgba(56,203,219,.13);--ok:#45C788;--ok-soft:rgba(69,199,136,.14);--warn:#F2A24E;--violet:#A38BF0;--violet-soft:rgba(163,139,240,.15);--sans:"Hanken Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+*{box-sizing:border-box}
+@page{size:A4;margin:0}
+html{color-scheme:dark;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;font-size:12.5px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.lnk{color:var(--cy-2);font-size:.92em}
+.cover{position:relative;height:296mm;display:flex;flex-direction:column;background:var(--bg);background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:28px 28px;page-break-after:always;overflow:hidden}
+.cover::before{content:'';position:absolute;right:-180px;top:-180px;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(56,203,219,.22),rgba(56,203,219,0) 62%)}
+.cover>*{position:relative;z-index:2}
+.cover-top{display:flex;align-items:center;justify-content:space-between;padding:34px 46px}
+.brand{font-weight:800;font-size:17px;letter-spacing:.09em}.brand b{color:var(--cy)}
+.cover-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-2)}
+.cover-main{margin-top:auto;padding:0 46px 54px}
+.cover-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cy);margin-bottom:14px}
+.cover h1{margin:0 0 16px;font-size:44px;line-height:1.06;letter-spacing:-.02em;max-width:16ch}
+.cover p{margin:0;color:var(--text-2);font-size:16px;max-width:54ch}
+.cover .legend{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.cover .legend .pill{font-size:11px}
+.cover .legend span.x{color:var(--text-2);font-size:12.5px;align-self:center;margin-right:6px}
+.cover-foot{padding:0 46px 34px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3)}
+section{padding:30px 46px 26px;border-top:1px solid var(--border);break-before:page}
+section:first-of-type{border-top:0;break-before:auto}
+.s-head{break-inside:avoid;break-after:avoid}
+h2::first-letter{text-transform:uppercase}
+section>p:first-of-type{break-after:avoid}
+.s-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:14px}
+.s-eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--cy);margin-bottom:6px}
+h2{margin:0;font-size:22px;letter-spacing:-.015em;line-height:1.15}
+.price{font-size:20px;font-weight:600;color:var(--cy);white-space:nowrap;background:var(--cy-soft);border:1px solid rgba(56,203,219,.35);border-radius:999px;padding:6px 14px}
+p{margin:0 0 12px;color:var(--text-2);max-width:72ch}
+p b{color:var(--text)}
+p.note{font-size:12px}
+ul{margin:0 0 12px;padding-left:18px;color:var(--text-2)}li{margin-bottom:5px}li b{color:var(--text)}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin:4px 0 14px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px 12px}
+.stat .v{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--cy);letter-spacing:-.02em;line-height:1}
+.stat .t{font-size:11px;color:var(--text-2);margin-top:7px;line-height:1.35}
+table.tbl{width:100%;border-collapse:separate;border-spacing:0;margin:6px 0 14px;background:var(--surface);border:1px solid var(--border);border-radius:13px;overflow:hidden;font-size:12px;page-break-inside:auto}
+table.tbl tr{page-break-inside:avoid}
+table.tbl th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);text-align:left;padding:10px 12px;background:var(--surface-2);border-bottom:1px solid var(--border-2)}
+table.tbl td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text-2);line-height:1.45}
+table.tbl tr:last-child td{border-bottom:0}
+table.tbl td.first{color:var(--text);font-weight:700}
+table.tbl-feat td.first{width:24%}
+table.tbl-feat td.st{width:23%}
+table.tbl-check td.first{width:34px;font-family:var(--mono);color:var(--cy)}
+table.tbl-check td{padding:6px 12px;font-size:11.5px;line-height:1.38}
+table.tbl-check th{padding:8px 12px}
+.foot{break-before:avoid}
+.pill{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;border-radius:999px;padding:3px 9px;border:1px solid;line-height:1.3}
+.pill.ok{color:var(--ok);background:var(--ok-soft);border-color:rgba(69,199,136,.4)}
+.pill.cy{color:var(--cy);background:var(--cy-soft);border-color:rgba(56,203,219,.4)}
+.pill.vi{color:var(--violet);background:var(--violet-soft);border-color:rgba(163,139,240,.4)}
+.claim-line{color:var(--text);font-weight:600;font-size:13px;border-left:3px solid var(--cy);padding:6px 12px;background:var(--cy-soft);border-radius:0 10px 10px 0;max-width:none;margin:0 0 14px}
+.rest{display:block;margin-top:5px;font-size:11px;color:var(--text-3)}
+.foot{padding:22px 46px 30px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3)}
+</style></head><body>
+<div class="cover"><div class="cover-top"><div class="brand">CRM <b>NÁUTICO</b></div><div class="cover-tag">Leandro Ramos · Broker Náutico</div></div>
+<div class="cover-main"><div class="cover-eyebrow">Listado de features · propuesta de septiembre 2026</div><h1>Todo lo que tiene el CRM, ítem por ítem.</h1><p>Lo construido en la demo, lo comprometido en cada etapa y lo que la spec deja afuera. Con un checklist de 15 preguntas para ponerle en frente a cualquier alternativa.</p><div class="legend"><span class="x">Cómo leer:</span><span class="pill ok">Hecho</span><span class="x">en la demo</span><span class="pill cy">Propuesta</span><span class="x">comprometido en esa etapa</span><span class="pill vi">Spec</span><span class="x">en la especificación, fuera de la propuesta</span></div></div>
+<div class="cover-foot"><span>Oct 15, 2026 · Lucho</span><span>crm-nautico.onrender.com</span></div></div>
+<section><div class="s-head"><div><div class="s-eyebrow">Sección 01</div><h2>En una página</h2></div></div>
+<p>El CRM Náutico es un sistema a medida para que el negocio de Leandro se acuerde de cada persona: qué barco buscó, cuál tiene, cuándo va a querer el siguiente. La propuesta enviada (septiembre 2026) lo divide en un paso previo de agentes de IA en Prometheo (USD 700) y cuatro etapas del CRM (USD 10.000, o 9.000 contratando las cuatro juntas, unos 3,5 meses). Hoy ya existe una demo funcionando en <span class="mono lnk">https://crm-nautico.onrender.com.</span></p>
+<table class="tbl"><thead><tr><th>Etapa (propuesta de septiembre 2026)</th><th>Qué queda funcionando</th><th>Plazo</th><th>Inversión</th></tr></thead><tbody>
+<tr><td class="first">Paso previo: agentes de IA en Prometheo</td><td>Respondés en segundos las 24 horas y los leads entran calificados</td><td>3 semanas</td><td>USD 700 (+ 300/mes opcional), aparte del CRM</td></tr>
+<tr><td class="first">Etapa 1: núcleo del CRM y memoria</td><td>Queda registrado qué buscó cada persona, de todos los canales</td><td>4 semanas</td><td>USD 3.500</td></tr>
+<tr><td class="first">Etapa 2: tasador y precios</td><td>Los dueños que quieren vender te encuentran; destrabás los barcos parados</td><td>2 a 3 semanas</td><td>USD 1.750</td></tr>
+<tr><td class="first">Etapa 3: motor de coincidencias y envío</td><td>Cada barco nuevo te dice a quién llamar, con el mensaje escrito</td><td>3 semanas</td><td>USD 3.000</td></tr>
+<tr><td class="first">Etapa 4: escalera náutica y tablero</td><td>El sistema avisa cuándo un cliente viejo está por comprar de nuevo</td><td>2 a 3 semanas</td><td>USD 1.750</td></tr>
+</tbody></table>
+<div class="stats"><div class="stat"><div class="v">18</div><div class="t">tablas de datos</div></div><div class="stat"><div class="v">35</div><div class="t">rutas de API</div></div><div class="stat"><div class="v">10</div><div class="t">pantallas</div></div><div class="stat"><div class="v">23</div><div class="t">pruebas automáticas, 23 de 23</div></div><div class="stat"><div class="v">37</div><div class="t">personas de muestra</div></div><div class="stat"><div class="v">28</div><div class="t">embarcaciones con fotos reales</div></div></div>
+<p class="note"><b>Lo que ya está construido en la demo (verificado en el código el 15/10/2026):</b> 18 tablas de datos, 35 rutas de API, 10 pantallas, 23 pruebas automáticas que pasan, y datos de muestra: 37 personas, 28 embarcaciones con fotos reales del sitio de Leandro, 22 búsquedas, 18 operaciones, 11 conversaciones.</p>
+<p><b>Cómo leer cada ítem de este listado.</b> <i>Hecho</i> = está en la demo y se puede mostrar hoy. <i>Propuesta</i> = comprometido en la propuesta, se construye en esa etapa. <i>Spec</i> = está en la especificación técnica del sistema pero no en la propuesta. Si el competidor dice que sí a todo, pedirle que lo muestre ítem por ítem: cada uno de estos tiene una pantalla, una regla o una tabla concreta detrás.</p>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Paso previo</div><h2>agentes de IA en Prometheo</h2></div><div class="price mono">USD 700</div></div>
+<p>Son agentes creados a medida para el negocio náutico, dentro de la plataforma Prometheo, que atienden la puerta mientras el CRM se acuerda de todo. Se contrata aparte del CRM y puede contratarse solo.</p>
+<table class="tbl tbl-feat"><thead><tr><th>Feature</th><th>Qué hace</th><th>Estado</th></tr></thead><tbody>
+<tr><td class="first">Bandeja única</td><td>WhatsApp, Instagram DM y Facebook conectados a una sola bandeja (Prometheo)</td><td class="st"><span class="pill cy">Propuesta</span></td></tr>
+<tr><td class="first">Agente de primera respuesta 24/7</td><td>Contesta en segundos, todos los días, y hace las preguntas de calificación náutica: ¿Delta o río abierto? ¿familia o pesca? ¿entrega algo?</td><td class="st"><span class="pill cy">Propuesta</span></td></tr>
+<tr><td class="first">Agentes creados ad hoc en la plataforma</td><td>Cada agente se configura para este negocio (prompts, preguntas, reglas), no es un bot genérico</td><td class="st"><span class="pill cy">Propuesta</span></td></tr>
+<tr><td class="first">Pide el WhatsApp temprano en Instagram</td><td>Para poder mandar fotos y ficha, y para que el teléfono sea la clave que une a la misma persona en todos los canales</td><td class="st"><span class="pill cy">Propuesta</span><span class="rest">(regla de la spec §1.bis)</span></td></tr>
+<tr><td class="first">Etiquetado automático por IA</td><td>Comprador, quiere vender, entrega usado, urgente, uso familiar, sin stock exacto</td><td class="st"><span class="pill cy">Propuesta</span></td></tr>
+<tr><td class="first">Etiqueta "lo lleva Leandro"</td><td>Apaga el bot en esa conversación cuando la charla se pone seria; el cierre es de Leandro</td><td class="st"><span class="pill cy">Propuesta</span></td></tr>
+<tr><td class="first">El CRM le devuelve a Prometheo lo que dedujo</td><td>Escribe en el lead variables como "busca open hasta 25k" para que Leandro lo vea donde conversa</td><td class="st"><span class="pill vi">Spec</span><span class="rest">(API de Prometheo PATCH /leads)</span></td></tr>
+<tr><td class="first">Migración de Facebook a página de empresa + capacitación</td><td>Requisito para Instagram Messaging API, campañas y métricas</td><td class="st"><span class="pill cy">Propuesta</span></td></tr>
+<tr><td class="first">Arreglo del botón de contacto y links de WhatsApp de la web</td><td>Hoy rotos; incluido sin cargo</td><td class="st"><span class="pill cy">Propuesta</span></td></tr>
+<tr><td class="first">Simulador de mensaje entrante</td><td>Botón "Simular mensaje entrante" que mete una conversación como si viniera de Prometheo, para mostrar el flujo completo sin conectar nada</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(adaptador lib/prometheo.js)</span></td></tr>
+<tr><td class="first">Regla: el bot califica, no cierra</td><td>En una operación de USD 30.000 cierra Leandro; ningún mensaje del CRM sale sin aprobación humana</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">en el CRM y escrito en la propuesta</span></td></tr>
+</tbody></table>
+<p>La suscripción de Prometheo (USD 49 a 149 por mes según plan) va a nombre de Leandro y se paga aparte.</p>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Etapa 1</div><h2>núcleo del CRM y memoria</h2></div><div class="price mono">USD 3.500</div></div>
+<p>Es la base que no se tira nunca: una sola ficha por persona y una búsqueda guardada por cada cosa que alguien pidió. La mayor parte ya está construida en la demo.</p>
+<table class="tbl tbl-feat"><thead><tr><th>Feature</th><th>Qué hace</th><th>Estado</th></tr></thead><tbody>
+<tr><td class="first">Una sola ficha por persona</td><td>La misma persona que escribió por Instagram en 2022 y por WhatsApp en 2026 es un solo registro; la clave es el teléfono normalizado, después el usuario de Instagram</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(tabla persona, deduplicación al entrar)</span></td></tr>
+<tr><td class="first">Roles acumulativos</td><td>Comprador, vendedor, ex-cliente comprador, ex-cliente vendedor, curioso: se suman, nunca se pisan</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Origen y referido</td><td>De dónde vino (Instagram, WhatsApp, web, Facebook, referido, guardería o club, portal) y quién lo refirió</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Contexto personal y "no contactar"</td><td>Lo que contó de su vida (familia de 4, pesca con amigos, guarda en tal náutica) alimenta el matching; el no contactar se respeta siempre</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Búsqueda como entidad propia</td><td>Qué busca: tipo, eslora, presupuesto, motor y HP, uso, baño, trailer, urgencia, qué entrega en parte de pago, limitación declarada, modelo de referencia</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(tabla busqueda)</span></td></tr>
+<tr><td class="first">Histórico de búsquedas que nunca se borra</td><td>Una búsqueda se cierra con motivo (satisfecha, perdida, pausada) y queda; una persona puede tener la de 2023 y la de 2027</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">La IA lee la conversación y arma la búsqueda</td><td>Pegás el mensaje tal como llegó y sale la búsqueda estructurada; usa Claude y, si no hay conexión, un lector de respaldo</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(lib/extraccion.js)</span></td></tr>
+<tr><td class="first">Lo mismo con audios de WhatsApp</td><td>Se procesa la transcripción que entrega Prometheo</td><td class="st"><span class="pill cy">Propuesta</span><span class="rest">(spec §1.bis)</span></td></tr>
+<tr><td class="first">Todo el historial acumulado procesado de una vez</td><td>Lee por API todas las conversaciones viejas de Prometheo, de a lotes, con reintentos, sin duplicar personas</td><td class="st"><span class="pill cy">Propuesta</span><span class="rest">(spec §8)</span></td></tr>
+<tr><td class="first">Alta rápida de búsqueda en menos de un minuto</td><td>Pantalla pensada para completar mientras habla por teléfono</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(+ Búsqueda rápida)</span></td></tr>
+<tr><td class="first">Historial de conversaciones unificado</td><td>Todos los canales en una línea de tiempo por persona (WhatsApp, Instagram, Facebook, web, mail, teléfono, presencial), con quién escribió cada mensaje: cliente, Leandro o agente de IA</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Ficha de persona completa</td><td>Datos, roles, búsquedas activas e históricas, sus embarcaciones, sus operaciones, conversaciones, señales</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Línea de tiempo de sus embarcaciones</td><td>Qué compró y vendió, cuándo y a cuánto; marca los upgrades y estima su próxima compra con su propio ciclo</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Inventario con ficha técnica real</td><td>Tipo, marca, modelo, año, eslora, manga, motor (marca, HP, tipo, horas), combustible, equipamiento, estado, baño, trailer, papeles, exclusividad, fotos, link de publicación</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(28 embarcaciones de muestra)</span></td></tr>
+<tr><td class="first">Las ~140 embarcaciones de Leandro cargadas</td><td>Carga única desde su propio sitio, con fichas completas</td><td class="st"><span class="pill cy">Propuesta</span></td></tr>
+<tr><td class="first">Precio mínimo del dueño privado</td><td>Existe en la ficha pero nunca sale a una vista pública ni a un mensaje</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(probado en los tests)</span></td></tr>
+<tr><td class="first">Dónde está publicada cada embarcación</td><td>Web propia, Instagram, portal; alerta de las que están en venta sin publicar en ningún lado</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Días en stock y consultas por barco</td><td>Para ver qué está parado</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Operaciones con las dos puntas</td><td>Cada operación vincula barco, comprador y vendedor; 9 etapas de consulta a cerrada o caída; motivo de caída; enlace venta vieja con compra nueva</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Auditoría</td><td>Toda acción sobre un contacto queda con autor (Leandro, agente de IA o sistema) y hora</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(tabla auditoria)</span></td></tr>
+<tr><td class="first">Acceso para Leandro y su administrativa</td><td>Usuarios con acceso al CRM</td><td class="st"><span class="pill cy">Propuesta</span><span class="rest">(la demo no tiene login)</span></td></tr>
+</tbody></table>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Etapa 2</div><h2>tasador y precios</h2></div><div class="price mono">USD 1.750</div></div>
+<p>Ataca el cuello de botella que Leandro declaró: conseguir barcos. El tasador ya funciona en la demo; lo que falta es alimentarlo con su registro real de ventas.</p>
+<table class="tbl tbl-feat"><thead><tr><th>Feature</th><th>Qué hace</th><th>Estado</th></tr></thead><tbody>
+<tr><td class="first">Página pública "¿Cuánto vale tu embarcación hoy?"</td><td>Formulario con la estética del sitio: tipo, marca, modelo, año, eslora, horas, marca de motor, HP, cantidad de motores, estado, nombre y WhatsApp</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(/tasador)</span></td></tr>
+<tr><td class="first">Valuación con precios reales de venta</td><td>Comparables del inventario y ventas cerradas, ajustados por año, horas de motor, estado y cantidad de motores (bimotor suma, no duplica)</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(lib/tasador.js)</span></td></tr>
+<tr><td class="first">Mejor con el registro de operaciones de Leandro</td><td>Cada venta cerrada con precio real mejora la próxima tasación; es el dato que ningún competidor tiene</td><td class="st"><span class="pill cy">Propuesta</span><span class="rest">(pide el registro)</span></td></tr>
+<tr><td class="first">Siempre un rango con su fundamento</td><td>Nunca un número suelto: mínimo, máximo y por qué</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">El dueño entra al CRM como captación</td><td>Queda como persona con rol vendedor y su barco con ficha ya cargada; aparece en Hoy como "Oportunidad de captación"; si ya existía por teléfono, no se duplica</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Mensaje de WhatsApp listo para el dueño</td><td>Con la banda de valor y las lanchas parecidas del stock (fotos y links reales), botón copiar</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Cada tasación es también dato de mercado</td><td>Se guarda con origen (web pública, informe anual, carga interna) y si se convirtió en captación</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(tabla tasacion)</span></td></tr>
+<tr><td class="first">Informe de precio para los barcos parados</td><td>El mismo motor mirando el inventario: argumento con datos para sentarse con el dueño de un barco que lleva 6 meses</td><td class="st"><span class="pill cy">Propuesta</span><span class="rest">(la demo muestra días en stock, no el informe)</span></td></tr>
+<tr><td class="first">Piezas para Instagram que lleven gente al tasador</td><td>Contenido para redes</td><td class="st"><span class="pill cy">Propuesta</span></td></tr>
+</tbody></table>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Etapa 3</div><h2>motor de coincidencias y envío</h2></div><div class="price mono">USD 3.000</div></div>
+<p>Es el corazón del sistema y está construido y probado: entra un barco y el CRM dice a quién le sirve, por qué, y escribe el mensaje. Lo único que falta es el envío real por WhatsApp a través de Prometheo.</p>
+<table class="tbl tbl-feat"><thead><tr><th>Feature</th><th>Qué hace</th><th>Estado</th></tr></thead><tbody>
+<tr><td class="first">Entra un barco, dice a quién le sirve</td><td>Lista ordenada de candidatos con puntaje y motivo en texto ("buscaba una open hasta 25k para el Delta, esta entra")</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(lib/matching.js)</span></td></tr>
+<tr><td class="first">Entra una búsqueda, dice qué barcos del stock le sirven</td><td>El mismo motor en el otro sentido; una sola regla para los dos, así un par nunca encaja en una dirección y no en la otra</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(probado)</span></td></tr>
+<tr><td class="first">Filtros duros</td><td>Tipo incompatible, necesita baño contra una open sin baño, persona en no contactar, su propio barco, precio fuera de tolerancia</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Puntaje con desglose</td><td>Eslora, precio, uso declarado, motor y HP, antigüedad de la búsqueda, temperatura de la persona, señales recientes; cada factor se muestra</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Modelo de referencia</td><td>"Busco una 1700" también considera 1600 y 1800 de la misma familia</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Tolerancias ajustables sin tocar código</td><td>Hasta 15 % sobre el presupuesto entra; entre 15 y 30 % es "casi"; piso del 60 %; puntaje mínimo 25. Viven en una tabla de configuración</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(tabla config)</span></td></tr>
+<tr><td class="first">"Casi entra" y umbrales para negociar</td><td>Muestra quién entraría si el dueño baja a tal precio: "si baja a 21.000 se suman 3 compradores"</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Mensaje redactado para cada candidato</td><td>Listo para aprobar, editar o descartar; termina invitando a responder</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Nunca sale solo</td><td>Toda propuesta queda pendiente hasta que una persona la aprueba, desde la pantalla o por WhatsApp</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(tabla propuesta)</span></td></tr>
+<tr><td class="first">No repite ni insiste</td><td>No duplica una propuesta pendiente ni vuelve a proponer lo que Leandro descartó</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(probado)</span></td></tr>
+<tr><td class="first">Baja de precio inteligente</td><td>Al bajar el precio distingue quién entra gracias a la baja, a quién ya se le ofreció (le avisa la baja) y quién ya calificaba</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(probado)</span></td></tr>
+<tr><td class="first">Aviso si el precio queda bajo el mínimo del dueño</td><td>Avisa, no lo cambia solo; el mínimo nunca aparece en un mensaje</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(probado)</span></td></tr>
+<tr><td class="first">Eventos del negocio</td><td>Barco publicado, precio bajado, búsqueda creada o reabierta: cada hecho se registra una vez, venga de la pantalla, de WhatsApp o de una importación; lo que quede sin procesar se reprocesa al arrancar</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(tabla evento)</span></td></tr>
+<tr><td class="first">Ventana de 24 horas de WhatsApp resuelta sola</td><td>Dentro de la ventana sale texto libre; fuera, plantilla con parámetros. Leandro no necesita saber que la regla existe</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">la decisión (lib/propuestas.js); el envío real por Prometheo y las plantillas aprobadas por Meta: Propuesta</span></td></tr>
+<tr><td class="first">Lead sin teléfono (solo Instagram)</td><td>El mensaje queda como tarea de copiar y pegar en vez de intentar enviar</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(vía copy-paste)</span></td></tr>
+<tr><td class="first">Pantalla Hoy</td><td>Lo que hay que aprobar, lo que espera seguimiento personal con semáforo (verde menos de 2 h, amarillo menos de 12 h, rojo después), captaciones del tasador, escalera, agenda de 72 horas</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Carga de unidades por WhatsApp desde el celular</td><td>Fotos y texto como salga ("Quicksilver 1800 del 2017, Mercury 115, 400 hs, pide 23.500") se vuelven ficha; pregunta lo que falta; LISTO publica y dispara el matching; "1 3" aprueba envíos; "bajó a 52 lucas" cambia precio; "se vendió la Prinz" la retira; un audio pide texto; un número no habilitado se ignora</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">y probado (figuraba en la versión de agosto de la propuesta); el número de WhatsApp real lo pone el cliente</span></td></tr>
+<tr><td class="first">Simulador de esa carga dentro del CRM</td><td>Pantalla "Carga por WhatsApp" para mostrarlo sin conectar un número</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+</tbody></table>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Etapa 4</div><h2>escalera náutica y tablero</h2></div><div class="price mono">USD 1.750</div></div>
+<p>La escalera (saber cuándo un cliente viejo va a querer algo más grande) ya tiene el puntaje y la tarjeta en la demo; lo que falta es capturar las señales en producción y el tablero de métricas.</p>
+<table class="tbl tbl-feat"><thead><tr><th>Feature</th><th>Qué hace</th><th>Estado</th></tr></thead><tbody>
+<tr><td class="first">Puntaje de upgrade por ex-cliente</td><td>Sube desde el año 3 de la compra, pico entre los años 4 y 6, más señales pesadas</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(lib/escalera.js)</span></td></tr>
+<tr><td class="first">Señales que se registran</td><td>Tasó su barco, lo publicó en un portal, visitó la web, miró una embarcación, abrió o respondió el informe anual, interactuó en redes, mencionó una limitación, dio de baja el seguro, aniversario de compra</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(tabla senal, 10 tipos)</span></td></tr>
+<tr><td class="first">Tarjeta en Hoy</td><td>"Ex-clientes por dar el salto": nombre, barco actual, señales detectadas y los barcos del inventario que le encajan, un escalón arriba en eslora y precio</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Captura automática de señales en producción</td><td>Tasador propio (dedup por teléfono), extracción de lo que dijo en la conversación, aniversario, apertura del informe anual, quién mira qué ficha en la web</td><td class="st"><span class="pill cy">Propuesta</span><span class="rest">portales, seguro y redes quedan manuales</span></td></tr>
+<tr><td class="first">Informe anual de valor</td><td>En cada aniversario de compra el cliente recibe cuánto vale hoy su barco; su respuesta o su silencio es una señal</td><td class="st"><span class="pill cy">Propuesta</span><span class="rest">(la demo ya registra la señal y el origen "informe anual" de la tasación)</span></td></tr>
+<tr><td class="first">Tope de comunicaciones automáticas</td><td>Máximo 4 por persona por año: el Delta es chico</td><td class="st"><span class="pill vi">Spec</span></td></tr>
+<tr><td class="first">Privacidad de las señales</td><td>Son para saber cuándo llamar, nunca para mencionárselas al cliente</td><td class="st"><span class="pill vi">Spec</span></td></tr>
+<tr><td class="first">Seguros</td><td>Pólizas vencidas, las que vencen en 30 días, en venta sin seguro, y "dieron de baja el seguro: casi seguro vendieron"</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(pantalla Seguros, extra)</span></td></tr>
+<tr><td class="first">Operaciones por etapa</td><td>Pipeline con las 9 etapas y las dos puntas de cada operación</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Inventario estancado</td><td>Días en stock por barco y consultas recibidas</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Tablero único de métricas</td><td>Consultas por mes y por canal, embudo de conversión, tiempo medio de respuesta, inventario por antigüedad, redes</td><td class="st"><span class="pill cy">Propuesta</span><span class="rest">(en la demo: semáforo de respuesta, pipeline y días en stock, sin el tablero consolidado)</span></td></tr>
+<tr><td class="first">Cuántas consultas entran y cuántas se pierden</td><td>Visibilidad del 100 % de los leads y de dónde vienen</td><td class="st"><span class="pill cy">Propuesta</span><span class="rest">(compromiso explícito)</span></td></tr>
+</tbody></table>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Sección 07</div><h2>Lo que la demo ya tiene y no estaba en la propuesta</h2></div></div>
+<p>Se construyó de más para la demo. Es un argumento: el sistema ya resuelve cosas que la propuesta ni cobra.</p>
+<table class="tbl tbl-feat"><thead><tr><th>Feature</th><th>Qué hace</th><th>Estado</th></tr></thead><tbody>
+<tr><td class="first">Radar de mercado (MercadoLibre y Marketplace)</td><td>Avisos nuevos arriba; bajas de precio como oportunidad de captación, con un mensaje que cita cuántos compradores activos hay para ese barco; vincula al dueño si ya está en la base</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">con avisos reales relevados a mano; la lectura automática diaria necesita cuenta de desarrollador de MercadoLibre</span></td></tr>
+<tr><td class="first">Agenda</td><td>Citas de mostrar embarcación, prueba de navegación, firma de transferencia, visita de tasación y entrega; espejo en Google Calendar</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">con Google Calendar simulado; el real es cambiar un archivo (lib/gcal.js) y la autorización de Leandro</span></td></tr>
+<tr><td class="first">Seguros</td><td>Póliza, aseguradora, vencimiento y prima por embarcación; alertas de vencidas y por vencer; baja de seguro como señal de venta</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Línea de tiempo de embarcaciones por persona</td><td>Compró, vendió, volvió a comprar; upgrades enlazados; próxima compra estimada con su propio ciclo</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Sugerencias "un escalón arriba"</td><td>Para cada ex-cliente, los barcos del stock más grandes y más caros que el suyo</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Botón Ofrecer en Búsquedas</td><td>Solo en candidatas nuevas sin ofrecer; el resto muestra que ya se ofreció</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Actividad del motor</td><td>Registro de qué evaluó, qué propuso y qué se resolvió</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(pantalla y /api/eventos)</span></td></tr>
+<tr><td class="first">Operadores habilitados para cargar por WhatsApp</td><td>Alta y baja de los celulares que pueden cargar unidades</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+</tbody></table>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Sección 08</div><h2>Base técnica</h2></div></div>
+<p>Simple a propósito: que dos personas puedan mantenerlo y que el despliegue sea trivial. Los datos son de Leandro desde el día uno.</p>
+<table class="tbl tbl-feat"><thead><tr><th>Feature</th><th>Detalle</th><th>Estado</th></tr></thead><tbody>
+<tr><td class="first">Modelo de datos completo</td><td>18 tablas: persona, búsqueda, embarcación, operación, conversación, mensaje, tasación, señal, propuesta, cita, aviso externo, auditoría, evento, operador, borrador de embarcación, mensaje de carga, contexto del operador, configuración</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Todo en dólares, nada se borra</td><td>Montos en USD; búsquedas, operaciones y personas se cierran con motivo y quedan</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Espejo propio de las conversaciones</td><td>Todo lo que entra por Prometheo se guarda en la base del CRM: si mañana se cambia de proveedor, los datos siguen siendo de Leandro</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">el modelo; la ingesta real es Propuesta</span></td></tr>
+<tr><td class="first">Integraciones detrás de adaptadores</td><td>Prometheo (lib/prometheo.js), Google Calendar (lib/gcal.js), WhatsApp Cloud API (lib/intake/whatsapp-cloud.js): se reemplaza un archivo, no se toca el resto</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Webhook de WhatsApp con firma verificada</td><td>Rechaza firmas inválidas, no procesa dos veces el mismo mensaje, descarga fotos, corre en modo seco sin credenciales</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">y probado</span></td></tr>
+<tr><td class="first">IA real con respaldo</td><td>Claude lee texto libre y fotos; sin conexión cae a un lector determinístico y el sistema no se queda en blanco</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">23 pruebas automáticas</td><td>Reglas del motor, idempotencia, bajas de precio, umbrales, privacidad del mínimo, la conversación de carga completa, protección del borrador, firma y parseo del webhook</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(npm test, 23 de 23)</span></td></tr>
+<tr><td class="first">35 rutas de API y 10 pantallas</td><td>Búsquedas, Inventario, Hoy y Agenda, Clientes, Seguros, Radar, Operaciones, Búsqueda rápida, Carga por WhatsApp, Alta de embarcación; más el tasador público</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Desplegado</td><td><span class="mono lnk">https://crm-nautico.onrender.com,</span> despliegue automático desde el repositorio en cada cambio</td><td class="st"><span class="pill ok">Hecho</span><span class="rest">(plan gratuito: tarda unos 50 segundos en despertar)</span></td></tr>
+<tr><td class="first">Stack</td><td>Node + Express + SQLite, frontend sin build; una sola máquina alcanza</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Estética del sitio de Leandro</td><td>Tipografía, colores y logo de leandroramosbrokernautico.com</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Todo en español rioplatense</td><td>Pantallas, estados y mensajes generados</td><td class="st"><span class="pill ok">Hecho</span></td></tr>
+<tr><td class="first">Acceso con usuario y contraseña</td><td>Para Leandro y su administrativa</td><td class="st"><span class="pill cy">Propuesta</span></td></tr>
+<tr><td class="first">Fotos en un bucket y plantillas de Meta</td><td>Para producción: hoy las fotos van al disco del servidor</td><td class="st"><span class="pill cy">Propuesta</span></td></tr>
+</tbody></table>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Sección 09</div><h2>Lo que está en la spec pero no en la propuesta, y lo que no se promete</h2></div></div>
+<p>Para no prometer de más: esto existe en la especificación técnica o se descartó a propósito, y conviene decirlo así.</p>
+<p><b>En la spec, fuera de la propuesta de septiembre (se cotizan aparte si se piden):</b></p>
+<ul>
+<li>Meta Ads: atribución de qué campaña trajo cada lead y audiencias de retargeting por comportamiento real (en la versión de agosto figuraba como "campañas de retargeting segmentadas").</li>
+<li>Formularios del sitio WordPress entrando directo al CRM.</li>
+<li>Envío del informe anual por mail (SMTP).</li>
+<li>Integración con MercadoLibre por API (lectura automática del radar); hoy los avisos se relevan a mano.</li>
+<li>Alertas configurables de conversación sin respuesta (2 horas en horario, 12 fuera); la demo usa esos umbrales en el semáforo.</li>
+<li>Carga histórica dosificada: 20 pedidos por minuto, por lotes con punto de control, retomable sin duplicar.</li>
+</ul>
+<p><b>Lo que la spec dice que NO se construye en la primera versión:</b> facturación, contabilidad o AFIP; portal de clientes con login; app móvil nativa; firma digital; multiusuario con permisos complejos; multi-idioma; envío automático sin aprobación humana; bandeja de trabajo para responder (eso es Prometheo); agente de primera respuesta propio (eso es Prometheo).</p>
+<p><b>Lo que la propuesta no promete, textual:</b> que la IA cierre ventas sola; un número exacto de operaciones; resultados del tablero antes de 2 o 3 meses de datos; tocar la red de contactos, conseguir embarcaciones o vender.</p>
+<p><b>Lo que la propuesta pide de Leandro:</b> su registro de operaciones cerradas con precio real de venta; accesos a Instagram, Facebook, la web y los dominios; dos horas por semana durante la etapa 1; consultas estimadas por mes y ventas por año.</p>
+</section>
+<section><div class="s-head"><div><div class="s-eyebrow">Sección 10</div><h2>Checklist para confrontar al competidor</h2></div></div>
+<p>Un "sí" genérico no alcanza: cada pregunta pide que lo muestre en pantalla con un dato de Leandro. Si a todo dice que sí sin mostrarlo, ahí está la respuesta.</p>
+<p class="claim-line">Si el precio es un quinto, la pregunta final es simple: ¿cuáles de estos 15 puntos quedan afuera?</p>
+<table class="tbl tbl-check"><thead><tr><th>#</th><th>Pregunta</th><th>Lo que tendría que mostrar</th></tr></thead><tbody>
+<tr><td class="first">1</td><td>Una persona compró en 2022 por WhatsApp y consultó en 2026 por Instagram. ¿Es un solo registro con los dos roles y todo el historial junto?</td><td>Una ficha, roles acumulados, línea de tiempo con los dos canales</td></tr>
+<tr><td class="first">2</td><td>Pegá este mensaje tal como llegó: "busco algo tipo 1700 hasta 20 lucas para el Delta, tengo una Arco Iris para entregar". ¿Qué guarda?</td><td>Tipo, presupuesto, uso, qué entrega, modelo de referencia, en campos, no en una nota</td></tr>
+<tr><td class="first">3</td><td>Cargá una lancha nueva. ¿Me dice a quién le sirve, con el motivo y el mensaje ya escrito? ¿Puedo editarlo, descartarlo, y que no me lo vuelva a proponer?</td><td>Lista ordenada con motivo, mensaje editable, descarte recordado</td></tr>
+<tr><td class="first">4</td><td>Bajale el precio 10 % a esa lancha. ¿Qué pasa con los que ya tenían el mensaje y con los que ahora entran?</td><td>Aviso de baja a los ya ofrecidos, nuevos candidatos, sin duplicar</td></tr>
+<tr><td class="first">5</td><td>¿Dónde está el precio mínimo del dueño y cómo garantiza que nunca sale en un mensaje?</td><td>Campo privado y una prueba de que el mensaje no lo incluye</td></tr>
+<tr><td class="first">6</td><td>Mandale un mensaje a alguien que escribió hace 3 meses. ¿Resuelve solo la ventana de 24 horas de Meta? ¿Con qué plantilla aprobada?</td><td>Decisión texto libre o plantilla sin intervención; plantillas aprobadas por Meta</td></tr>
+<tr><td class="first">7</td><td>¿Cómo entra un dueño desde "¿cuánto vale mi lancha?" y con qué calcula el rango: ventas reales o precios de publicación?</td><td>Página pública, rango con fundamento, lead con la ficha cargada</td></tr>
+<tr><td class="first">8</td><td>Un cliente que compró hace 4 años tasó su barco. ¿Aparece en el tablero? ¿Con qué barcos del stock?</td><td>Tarjeta con señales y sugerencias un escalón arriba</td></tr>
+<tr><td class="first">9</td><td>Estoy en la guardería con el celular. ¿Cómo cargo la lancha con fotos sin entrar al sistema?</td><td>Fotos y texto por WhatsApp que se vuelven ficha; publicación y matching desde el chat</td></tr>
+<tr><td class="first">10</td><td>¿Cuántas consultas entraron este mes, por canal, y cuántas quedaron sin responder más de 2 horas?</td><td>Semáforo y conteo por canal, sin cargar nada a mano</td></tr>
+<tr><td class="first">11</td><td>Si mañana corto el servicio, ¿me llevo la base completa: personas, búsquedas, conversaciones, operaciones? ¿Las cuentas están a mi nombre?</td><td>Exportación completa y cuentas propias</td></tr>
+<tr><td class="first">12</td><td>¿Quién creó los agentes de IA, qué preguntan y cómo etiquetan? ¿Se apaga el bot en una conversación con una etiqueta?</td><td>Agentes configurados para náutica, etiquetas, etiqueta "lo lleva Leandro"</td></tr>
+<tr><td class="first">13</td><td>¿El agente pide el WhatsApp en Instagram para poder mandar fotos y ficha?</td><td>Regla configurada en el agente</td></tr>
+<tr><td class="first">14</td><td>¿Qué pruebas automáticas tiene el motor de coincidencias? ¿Cuántas y qué cubren?</td><td>Una corrida de pruebas, no una promesa</td></tr>
+<tr><td class="first">15</td><td>¿Qué cosas NO hace?</td><td>Una lista concreta; "hace todo" es la señal de alarma</td></tr>
+</tbody></table>
+</section>
+<div class="foot"><span>CRM Náutico · listado de features</span><span>Consultora Mati y Lucho · Oct 15, 2026</span></div>
+</body></html>
